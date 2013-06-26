@@ -1,0 +1,3 @@
+scope _.each
+bman state event =
+  _.each (get event players) 

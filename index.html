@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta name = "viewport" content = "initial-scale = 1.0, maximum-scale=1, minimum-scale=1">
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<canvas id="c" width="640" height="640" style="width:320px; height:320px;"></canvas>
+<script src="socket.io.js"></script>
+<script src="mousetrap.js"></script>
+<script>
+var canvasEl = document.getElementById("c")
+var c = canvasEl.getContext("2d")
+c.scale(2,2)
+c.fillRect(0,0,320,320)
+var pixelWidth = 320 / 8
+var pixelHeight = 320 / 8
+var render = function (frame) {
+  frame = frame.replace(/\|/g, "")
+  for (var y = 0; y < 8; y++) {
+    for (var x = 0; x < 8; x++) {
+      var color = frame.substr(((y * 8) + x) * 6, 6) 
+      c.fillStyle = "#" + color
+      c.fillRect(x*pixelWidth, y*pixelHeight, pixelWidth, pixelHeight)
+      c.fillStyle = "#000000"
+    }
+  }
+}
+
+var socket = io.connect('http://drewles.com:8012');
+var state
+socket.on("frame", function (frame) {
+  render(frame)
+})
+
+Mousetrap.bind("left", function () {
+  socket.emit("leftdown")
+}, 'keydown')
+
+Mousetrap.bind("left", function () {
+  socket.emit("leftup")
+}, 'keyup')
+
+Mousetrap.bind("right", function () {
+  socket.emit("rightdown")
+}, 'keydown')
+
+Mousetrap.bind("right", function () {
+  socket.emit("rightup")
+}, 'keyup')
+
+</script>
+</body>
