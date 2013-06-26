@@ -1,5 +1,5 @@
 _ = require("./underscore.js")
-var io = require('socket.io').listen(8012);
+var io = require('socket.io').listen(8012, {log: false});
 
 var bman = require("./bman.js")
 
@@ -26,6 +26,9 @@ io.sockets.on('connection', function (socket) {
   socket.on('downdown', function () { event.players[socket.id].dy = 1; });
   socket.on('downup', function () { event.players[socket.id].dy = 0; });
 
+  socket.on("gotoPoint", function (point) { event.players[socket.id].going = point; })
+  socket.on("stopGoing", function (point) { event.players[socket.id].going = null; })
+
   socket.on("disconnect", function () {
     delete event[socket.id]
     event.disconnected.push(socket.id)
@@ -42,7 +45,7 @@ var tick = function (state, event) {
   io.sockets.emit("frame", frame)
   setTimeout(function() {
     tick(state, event)
-  }, 16) 
+  }, 32) 
 }
 
 var randomColor = function () {

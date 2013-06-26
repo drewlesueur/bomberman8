@@ -70,5 +70,145 @@ Mousetrap.bind("down", function () {
 }, 'keyup')
 
 
+// up down left right
+var oneway = function () {
+  var getDx = function(e) {
+    for (var i = 0; i < e.touches.length; i++) {
+      var x = e.changedTouches[i].pageX 
+      var y = e.changedTouches[i].pageY 
+      if (x < 160 && y < 220 && y > 100) {
+        dx = -1 
+      } else if (x >= 160 && y < 220 && y > 100){
+        dx = 1
+      } else {
+        dx = 0
+      }
+    }
+    return dx
+  }
+  var getDy = function(e) {
+    for (var i = 0; i < e.touches.length; i++) {
+      var x = e.changedTouches[i].pageX 
+      var y = e.changedTouches[i].pageY 
+      if (y < 160 && x < 220 && x > 100) {
+        dy = -1 
+      } else if (y >= 160 && x < 220 && x > 100){
+        dy = 1
+      } else {
+        dy = 0
+      }
+    }
+    return dy
+  }
+
+  document.body.ontouchstart = function (e) {
+    var dx = 0;
+    var dy = 0;
+    dx = getDx(e)
+    if (dx == -1) socket.emit("leftdown")
+    else if (dx == 1) socket.emit("rightdown")
+
+    dy = getDy(e)
+    if (dy == -1) socket.emit("updown")
+    else if (dy == 1) socket.emit("downdown")
+  }
+
+  document.body.ontouchend = function (e) {
+    var dx = 0;
+    var dy = 0;
+    dx = getDx(e)
+    if (dx == -1) socket.emit("leftup")
+    else if (dx == 1) socket.emit("rightup")
+
+    dy = getDy(e)
+    if (dy == -1) socket.emit("upup")
+    else if (dy == 1) socket.emit("downup")
+  }
+}
+
+// try for cahnges
+var otherway = function () {
+  var x = 0
+  var y = 0
+  document.body.ontouchstart = function (e) {
+    e.preventDefault();
+    x = e.touches[0].pageX  
+    y = e.touches[0].pageY  
+  }
+
+  var moveTimeout = null;  
+  document.body.ontouchmove = function (e) {
+
+    var dx = e.touches[0].pageX - x
+    var dy = e.touches[0].pageY - y
+    if (!(Math.abs(dx) > 1 || Math.abs(dy) > 1)) return;
+
+    clearTimeout(moveTimeout)
+    moveTimeout = setTimeout(function () {
+      socket.emit("rightup")
+      socket.emit("downup")
+    }, 25)
+    e.preventDefault();
+    // trying to capture changes in movement here
+    x = e.touches[0].pageX 
+    y = e.touches[0].pageY
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) {
+        dx = -1
+      } else {
+        dx = 1
+      }
+      dy = 0
+    } else {
+      if (dy < 0) {
+        dy = -1
+      } else {
+        dy = 1
+      }
+      dx = 0
+    }
+
+    if (dx == -1) socket.emit("leftdown")
+    else if (dx == 1) socket.emit("rightdown")
+    else if (dx == 0) socket.emit("rightup")
+
+    if (dy == -1) socket.emit("updown")
+    else if (dy == 1) socket.emit("downdown")
+    else if (dy == 0) socket.emit("downup")
+  }
+
+  document.ontouchend = function (e) {
+    // todo
+    e.preventDefault();
+    socket.emit("rightup")
+    socket.emit("downup")
+  }
+}
+
+
+// click where you want to go
+var thirdway = function () {
+  var onTouch = function (e) {
+    e.preventDefault()
+    var pointX = Math.round(e.touches[0].pageX / pixelWidth)
+    var pointY = Math.round(e.touches[0].pageY / pixelHeight)
+    socket.emit("gotoPoint", [pointX, pointY])
+  }
+
+  document.body.ontouchstart = onTouch
+  document.body.ontouchmove = onTouch
+  document.body.ontouchend = function () {
+    socket.emit("stopGoing") 
+  }
+}
+
+
+otherway();
+
+
+
+
+
 </script>
 </body>

@@ -9,11 +9,18 @@ var maxed = function (x) {
   return x < 0 ? 0 : x > 7 ? 7 : x
 }
 
-var colors = ["ffffff", "00cc00", "0000cc", "00cc00", "000000"]
+var moveGoing = function (elapsed, goingX, x, rate) {
+  var roundedX = Math.round(x)
+  var dx = goingX < roundedX ? -1 : goingX > roundedX ? 1 : 0
+  newX = (rate * elapsed * dx) + x
+  return newX
+}
+
+var colors = ["ffffff", "0000ff"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
-  console.log("players!")
-  console.log(state.players)
+  //console.log("players!")
+  //console.log(state.players)
   _.each(event.disconnected, function (id) {
     //delete state.players[id]
   })
@@ -22,8 +29,16 @@ var bman = function (state, event) {
       var player = state.players[playerEvent.id]
       player.x = maxed(movedValue(elapsed, playerEvent.dx, player.x, player.moveRate))
       player.y = maxed(movedValue(elapsed, playerEvent.dy, player.y, player.moveRate))
+
+      var going = playerEvent.going
+      if (going) {
+        var goingX = going[0]
+        var goingY = going[1]
+        player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
+        player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
+      }
     } else {
-      console.log("here! :( -- " + playerEvent.id)
+      //console.log("here! :( -- " + playerEvent.id)
       state.players[playerEvent.id] = {
         x: _.random(0, 7),
         y: _.random(0, 7),
@@ -34,7 +49,6 @@ var bman = function (state, event) {
   })
   return state;       
 }
-
 
 
 // export
