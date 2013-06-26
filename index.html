@@ -27,7 +27,6 @@ var render = function (frame) {
       var color = frame.substr(((y * 8) + x) * 6, 6) 
       c.fillStyle = "#" + color
       c.fillRect(x*pixelWidth, y*pixelHeight, pixelWidth, pixelHeight)
-      c.fillStyle = "#000000"
     }
   }
 }
@@ -53,6 +52,23 @@ Mousetrap.bind("right", function () {
 Mousetrap.bind("right", function () {
   socket.emit("rightup")
 }, 'keyup')
+
+Mousetrap.bind("up", function () {
+  socket.emit("updown")
+}, 'keydown')
+
+Mousetrap.bind("up", function () {
+  socket.emit("upup")
+}, 'keyup')
+
+Mousetrap.bind("down", function () {
+  socket.emit("downdown")
+}, 'keydown')
+
+Mousetrap.bind("down", function () {
+  socket.emit("downup")
+}, 'keyup')
+
 
 </script>
 </body>

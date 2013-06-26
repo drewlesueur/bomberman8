@@ -5,25 +5,30 @@ var movedValue = function (elapsed, dx, x, rate) {
   return (rate * elapsed * dx) + x
 }
 
+var maxed = function (x) {
+  return x < 0 ? 0 : x > 7 ? 7 : x
+}
 
+var colors = ["ffffff", "00cc00", "0000cc", "00cc00", "000000"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
   console.log("players!")
   console.log(state.players)
   _.each(event.disconnected, function (id) {
-    delete state.players[id]
+    //delete state.players[id]
   })
   _.each(event.players, function (playerEvent) {
     if (playerEvent.id in state.players) {
       var player = state.players[playerEvent.id]
-      player.x = movedValue(elapsed, playerEvent.dx, player.x, player.moveRate)
-      player.y = movedValue(elapsed, playerEvent.dy, player.y, player.moveRate)
+      player.x = maxed(movedValue(elapsed, playerEvent.dx, player.x, player.moveRate))
+      player.y = maxed(movedValue(elapsed, playerEvent.dy, player.y, player.moveRate))
     } else {
+      console.log("here! :( -- " + playerEvent.id)
       state.players[playerEvent.id] = {
-        x: 4,
-        y: 4,
-        color: "cc0000",
-        moveRate: 1/50
+        x: _.random(0, 7),
+        y: _.random(0, 7),
+        color: colors[_.random(0, colors.length - 1)],
+        moveRate: 1/75
       }
     }
   })

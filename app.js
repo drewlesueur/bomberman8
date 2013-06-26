@@ -21,6 +21,11 @@ io.sockets.on('connection', function (socket) {
   socket.on('rightdown', function () { event.players[socket.id].dx = 1; });
   socket.on('rightup', function () { event.players[socket.id].dx = 0; });
 
+  socket.on('updown', function () { event.players[socket.id].dy = -1; });
+  socket.on('upup', function () { event.players[socket.id].dy = 0; });
+  socket.on('downdown', function () { event.players[socket.id].dy = 1; });
+  socket.on('downup', function () { event.players[socket.id].dy = 0; });
+
   socket.on("disconnect", function () {
     delete event[socket.id]
     event.disconnected.push(socket.id)
