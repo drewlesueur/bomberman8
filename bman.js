@@ -24,9 +24,15 @@ var bman = function (state, event) {
   var elapsed = event.elapsed
   //console.log("players!")
   //console.log(state.players)
-  _.each(event.disconnected, function (id) {
-    //delete state.players[id]
-  })
+  //console.log(event.disconnected)
+
+  if (event.disconnected.length) {
+    _.each(event.disconnected, function (id) {
+      delete state.players[id]
+      delete event.players[id] // should I mess with the event?
+    })
+    event.disconnected = []
+  }
   _.each(event.players, function (playerEvent) {
     if (playerEvent.id in state.players) {
       var player = state.players[playerEvent.id]

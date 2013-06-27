@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -36,7 +35,6 @@ var socket = io.connect('http://drewles.com:8012');
 var state
 socket.on("frame", function (frame) {
   render(frame)
-  console.log(Date.now())
 })
 
 Mousetrap.bind("left", function () {
@@ -206,8 +204,8 @@ var otherway = function () {
 var thirdway = function () {
   var onTouch = function (e) {
     e.preventDefault()
-    var pointX = Math.floor(e.touches[0].pageX / pixelWidth)
-    var pointY = Math.floor(e.touches[0].pageY / pixelHeight)
+    var pointX = Math.round(e.touches[0].pageX / pixelWidth)
+    var pointY = Math.round(e.touches[0].pageY / pixelHeight)
     socket.emit("gotoPoint", [pointX, pointY])
   }
 
@@ -219,7 +217,10 @@ var thirdway = function () {
 }
 
 
-thirdway();
+otherway();
+
+
+
 
 
 </script>

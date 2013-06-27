@@ -15,26 +15,27 @@ var state = {
 }
 
 io.sockets.on('connection', function (socket) {
-  event.players[socket.id] = {dx: 0, dy: 0, id: socket.id}
+  var id = _.uniqueId("s")
+  event.players[id] = {dx: 0, dy: 0, id: id}
   socket.emit("frame", "ff0000") 
-  socket.on('leftdown', function () { event.players[socket.id].dx = -1; });
-  socket.on('leftup', function () { event.players[socket.id].dx = 0; });
-  socket.on('rightdown', function () { event.players[socket.id].dx = 1; });
-  socket.on('rightup', function () { event.players[socket.id].dx = 0; });
+  socket.on('leftdown', function () { event.players[id].dx = -1; });
+  socket.on('leftup', function () { event.players[id].dx = 0; });
+  socket.on('rightdown', function () { event.players[id].dx = 1; });
+  socket.on('rightup', function () { event.players[id].dx = 0; });
 
-  socket.on('updown', function () { event.players[socket.id].dy = -1; });
-  socket.on('upup', function () { event.players[socket.id].dy = 0; });
-  socket.on('downdown', function () { event.players[socket.id].dy = 1; });
-  socket.on('downup', function () { event.players[socket.id].dy = 0; });
+  socket.on('updown', function () { event.players[id].dy = -1; });
+  socket.on('upup', function () { event.players[id].dy = 0; });
+  socket.on('downdown', function () { event.players[id].dy = 1; });
+  socket.on('downup', function () { event.players[id].dy = 0; });
 
-  socket.on("gotoPoint", function (point) { event.players[socket.id].going = point; })
-  socket.on("stopGoing", function (point) { event.players[socket.id].going = null; })
-  socket.on("adown", function (point) { event.players[socket.id].a = true; })
-  socket.on("aup", function (point) { event.players[socket.id].a = false; })
+  socket.on("gotoPoint", function (point) { event.players[id].going = point; })
+  socket.on("stopGoing", function (point) { event.players[id].going = null; })
+  socket.on("adown", function (point) { event.players[id].a = true; })
+  socket.on("aup", function (point) { event.players[id].a = false; })
 
   socket.on("disconnect", function () {
-    delete event[socket.id]
-    event.disconnected.push(socket.id)
+    delete event[id]
+    event.disconnected.push(id)
   })
 });
 
@@ -45,7 +46,10 @@ var tick = function (state, event) {
   event.time = now
   state = bman(state, event) 
   var frame = renderFrame(state)
-  io.sockets.emit("frame", frame)
+  if (frame !== lastFrame) {
+    io.sockets.emit("frame", frame)
+     lastFrame = frame
+  }
   setTimeout(function() {
     tick(state, event)
   }, 32) 
@@ -65,6 +69,7 @@ var randomFrame = function () {
   return str;
 }
 
+var lastFrame = ""
 var renderFrame = function (state) { 
   var ret = [];
   for (var i = 0; i < 64; i ++) {
