@@ -22,7 +22,7 @@ var addFlame = function(flames, x, y) {
     flames[x + "_" + y] = {
       x: x,
       y: y,
-      duration: 200
+      duration: 300
     } 
 }
 
@@ -121,6 +121,19 @@ var bman = function (state, event) {
     state.bombs[key].player.bombs += 1
     delete state.bombs[key]
   })
+
+  var flamesToDelete = []
+  _.each(state.flames, function (flame, key) {
+    flame.duration -= elapsed 
+    if (flame.duration <= 0) {
+      flamesToDelete.push(key)
+    }
+  })
+
+  _.each(flamesToDelete, function (key) {
+    delete state.flames[key]
+  })
+
 
 
   return state;       
