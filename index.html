@@ -209,22 +209,137 @@ var thirdway = function () {
   }
 
   document.body.ontouchstart = function (e) {
-    onTouch(e);
     if (e.touches.length > 1) {
-      document.title = Date.now()
       socket.emit("adown")
-      setTimeout(function () {
-        //socket.emit("aup")
-      }, 500)
     }
+    onTouch(e);
   }
   document.body.ontouchmove = onTouch
   document.body.ontouchend = function () {
     socket.emit("stopGoing") 
+      socket.emit("aup")
+  }
+}
+
+var fourthway = function () {
+  window.ondevicemotion = function (e) {
+    // var xyz = Math.round(e.accelerationIncludingGravity.x) + " " +  Math.round(e.accelerationIncludingGravity.y) + " " + Math.round(e.accelerationIncludingGravity.z)
+    //var xyz = Math.round(e.acceleration.x) + " " +  Math.round(e.acceleration.y) + " " + Math.round(e.acceleration.z)
+    //document.title = xyz
+    var x = Math.round(e.accelerationIncludingGravity.x)
+    var y = Math.round(e.accelerationIncludingGravity.y)
+
+    if (x <= -1) {
+      socket.emit("leftdown")
+    } else if (x >= 1) {
+      socket.emit("rightdown")
+    } else {
+      socket.emit("rightup")
+    }
+
+    if (y <= 6) {
+      socket.emit("updown")
+    } else if (y >= 6) {
+      socket.emit("downdown")
+    } else {
+      socket.emit("downup")
+    }
+  }
+}
+
+var fifthway = function () {
+  var lastGamma = 0
+  var lastBeta = 0
+  var baseGamma = 0
+  var baseBeta= 0
+  var beta
+  var gamma
+  var startTime = 0
+  document.body.ontouchstart = function (e) {
+    e.preventDefault()
+    startTime = Date.now()
+    socket.emit("adown")
+  }
+  document.body.ontouchend = function (e) {
+    var duration = Date.now() - startTime;
+
+    if (duration > 1000) {
+      baseBeta = beta
+    }
+    socket.emit("aup")
+    //baseGamma = gamma
+    //alert(baseGamma + " " + baseBeta)
+  }
+  var sensitivity = 6
+  window.ondeviceorientation = function (e) {
+    //document.title = Math.round(e.alpha) + "_" + Math.round(e.beta) + "_" + Math.round(e.gamma)
+    beta = Math.round(e.beta)
+    gamma = Math.round(e.gamma)
+
+    if (gamma <= baseGamma-sensitivity && lastGamma >= gamma - 1) {
+      socket.emit("leftdown")
+    } else if (gamma >= baseGamma+sensitivity && lastGamma <= gamma + 1) {
+      socket.emit("rightdown")
+    } else {
+      socket.emit("rightup")
+    }
+
+    if (beta <= baseBeta-sensitivity && lastBeta >= beta - 1) {
+      socket.emit("updown")
+    } else if (beta >= baseBeta+sensitivity && lastBeta <= beta + 1) {
+      socket.emit("downdown")
+    } else {
+      socket.emit("downup")
+    }
+
+    lastGamma = gamma
+    lastBeta = beta
+
+
+    return
+
+    if (x <= -1) {
+      socket.emit("leftdown")
+    } else if (x >= 1) {
+      socket.emit("rightdown")
+    } else {
+      socket.emit("rightup")
+    }
+
+    if (y <= 6) {
+      socket.emit("updown")
+    } else if (y >= 6) {
+      socket.emit("downdown")
+    } else {
+      socket.emit("downup")
+    }
+  }
+}
+
+var sixthway = function () {
+  var onTouch = function (e) {
+    e.preventDefault()
+    var pointX = Math.floor((e.touches[0].pageX - 10) / (pixelWidth / 4))
+    var pointY = Math.floor((e.touches[0].pageY - (160 + 80 ) + 10) / (pixelHeight /4))
+    socket.emit("gotoPoint", [pointX, pointY])
+  }
+
+  document.body.ontouchstart = function (e) {
+    if (e.touches.length > 1) {
+      socket.emit("adown")
+    }
+    onTouch(e);
+  }
+  document.body.ontouchmove = onTouch
+  document.body.ontouchend = function () {
+    socket.emit("stopGoing") 
+      socket.emit("aup")
   }
 }
 
 
+
+//sixthway();
 thirdway();
 
 

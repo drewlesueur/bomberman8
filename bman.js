@@ -18,32 +18,55 @@ var moveGoing = function (elapsed, goingX, x, rate) {
   return newX
 }
 
-var addFlame = function(flames, x, y) {
-    flames[x + "_" + y] = {
+var addFlame = function(state, x, y) {
+    var flames = state.flames
+    var bombs = state.bombs
+    var flameKey = x + "_" + y
+    if (flameKey in bombs) {
+      detinateBomb(state, bombs[flameKey], flameKey)
+    }
+    if (flameKey in state.playerPos) {
+      _.each(state.playerPos[flameKey], function (player){
+        player.color = "7f7f7f"
+        player.bombs = -1
+      })
+    }
+    flames[flameKey] = {
       x: x,
       y: y,
       duration: 300
     } 
 }
 
-var addFlames = function (flames, bomb) {
+var addFlames = function (state, bomb) {
+  flames = state.flames
+  bombs = state.bombs
   var bombX = bomb.x
   var bombY = bomb.y
   for (var i = bombX - 1; i >= 0; i--) {
-    addFlame(flames, i, bombY)
+    addFlame(state, i, bombY)
   }   
   for (var i = bombX + 1; i < 8; i++) {
-    addFlame(flames, i, bombY)
+    addFlame(state, i, bombY)
   }   
   for (var i = bombY - 1; i >= 0; i--) {
-    addFlame(flames, bombX, i)
+    addFlame(state, bombX, i)
   }   
   for (var i = bombY + 1; i < 8; i++) {
-    addFlame(flames, bombX, i)
+    addFlame(state, bombX, i)
   }   
 }
 
+var detinateBomb = function (state, bomb, key) {
+  state.bombs[key].player.bombs += 1
+  delete state.bombs[key]
+  addFlames(state, bomb)
+}
 
+var setPlayerPos = function (state, player, x, y) {
+  var key = x + "_" + y
+  
+} 
 var colors = ["ffffff", "0000ff", "ff0000", "ffff00", "ff00ff", "00ffff"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
@@ -71,13 +94,18 @@ var bman = function (state, event) {
         player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
         player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
       }
+      var roundX = Math.round(player.x)
+      var roundY = Math.round(player.y)
+      player.roundX = roundX
+      player.roundY = roundY
+      player.key = roundX + "_" + roundY
+      
+      setPlayerPos(state, player, roundX, roundY)
+      
 
       if (playerEvent.a) {
-        if (player.bombs && (event.time - player.bombTime > 100)) {
+        if (player.bombs > 0 && (event.time - player.bombTime > 100)) {
           player.bombTime = event.time
-          console.log("BOMB")
-          var roundX = Math.round(player.x)
-          var roundY = Math.round(player.y)
           var bombKey = roundX + "_" + roundY
           if (bombKey in state.bombs) {
 
@@ -98,29 +126,36 @@ var bman = function (state, event) {
     } else {
       //console.log("here! :( -- " + playerEvent.id)
       state.players[playerEvent.id] = {
-        x: _.random(0, 7),
-        y: _.random(0, 7),
+        x: 0,
+        y: 0,
+        roundX: 0,
+        roundY: 0,
+        key: "0_0",
         color: colors[_.random(0, colors.length - 1)],
-        moveRate: 1/75,
+        moveRate: 1/50,
         bombs: 3,
         bombTime: 0
       }
     }
   })
 
-  var bombsToDelete = []
-  _.each(state.bombs, function (bomb, key) {
-    bomb.fuse -= elapsed 
-    if (bomb.fuse <= 0) {
-      addFlames(state.flames, bomb)
-      bombsToDelete.push(key)
+  state.playerPos = {}
+  _.each(state.players, function (player, key) {
+    if (player.key in state.playerPos) {
+      state.playerPos[player.key].push(player)
+    } else {
+
+    state.playerPos[player.key] = [player]
     }
   })
 
-  _.each(bombsToDelete, function (key) {
-    state.bombs[key].player.bombs += 1
-    delete state.bombs[key]
+  _.each(state.bombs, function (bomb, key) {
+    bomb.fuse -= elapsed 
+    if (bomb.fuse <= 0) {
+      detinateBomb(state, bomb, key)
+    }
   })
+
 
   var flamesToDelete = []
   _.each(state.flames, function (flame, key) {

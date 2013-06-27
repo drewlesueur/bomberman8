@@ -11,8 +11,11 @@ var event = {
 var state = {
   players: {},
   bombs: {},
-  flames: {}
+  flames: {},
+  objects: {},
+  playersPos: {}
 }
+
 
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s")
@@ -76,7 +79,7 @@ var renderFrame = function (state) {
     ret[i] = "00aa00"
   }
   _.each(state.players, function (player) {
-    ret[Math.round(player.y) * 8 + Math.round(player.x)] = player.color
+    ret[player.roundY * 8 + player.roundX] = player.color
   })
 
   _.each(state.bombs, function (bomb) {
