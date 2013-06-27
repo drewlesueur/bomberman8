@@ -13,10 +13,13 @@ var moveGoing = function (elapsed, goingX, x, rate) {
   var roundedX = Math.round(x)
   var dx = goingX < roundedX ? -1 : goingX > roundedX ? 1 : 0
   newX = (rate * elapsed * dx) + x
+  if (dx < 1 && newX < goingX) newX = goingX
+  if (dx > 1 && newX > goingX) newX = goingX
   return newX
 }
 
-var colors = ["ffffff", "0000ff"]
+
+var colors = ["ffffff", "0000ff", "ff0000", "ffff00", "ff00ff", "00ffff"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
   //console.log("players!")
@@ -36,6 +39,10 @@ var bman = function (state, event) {
         var goingY = going[1]
         player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
         player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
+      }
+
+      if (playerEvent.a) {
+        state.bricks[player.x + "_" + player.y] = [player.x, player.y]
       }
     } else {
       //console.log("here! :( -- " + playerEvent.id)

@@ -10,7 +10,8 @@ var event = {
 
 var state = {
   field: [],
-  players: {}
+  players: {},
+  bricks: {}
 }
 
 io.sockets.on('connection', function (socket) {
@@ -28,6 +29,8 @@ io.sockets.on('connection', function (socket) {
 
   socket.on("gotoPoint", function (point) { event.players[socket.id].going = point; })
   socket.on("stopGoing", function (point) { event.players[socket.id].going = null; })
+  socket.on("adown", function (point) { event.players[socket.id].a = true; })
+  socket.on("aup", function (point) { event.players[socket.id].a = false; })
 
   socket.on("disconnect", function () {
     delete event[socket.id]
@@ -70,12 +73,19 @@ var renderFrame = function (state) {
   _.each(state.players, function (player) {
     ret[Math.round(player.y) * 8 + Math.round(player.x)] = player.color
   })
+
+  _.each(state.bricks, function (player) {
+    ret[Math.round(player[1]) * 8 + Math.round(player[0])] = "404040"
+  })
   return ret.join("")
   //return randomFrame();
 }
 
 tick(state, event);
 
+setInterval(function() {
+  state.bricks = {}
+}, 5000)
 
 
 process.on('uncaughtException', function(err) {
