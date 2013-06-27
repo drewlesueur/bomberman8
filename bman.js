@@ -18,6 +18,31 @@ var moveGoing = function (elapsed, goingX, x, rate) {
   return newX
 }
 
+var addFlame = function(flames, x, y) {
+    flames[x + "_" + y] = {
+      x: x,
+      y: y,
+      duration: 200
+    } 
+}
+
+var addFlames = function (flames, bomb) {
+  var bombX = bomb.x
+  var bombY = bomb.y
+  for (var i = bombX - 1; i >= 0; i--) {
+    addFlame(flames, i, bombY)
+  }   
+  for (var i = bombX + 1; i < 8; i++) {
+    addFlame(flames, i, bombY)
+  }   
+  for (var i = bombY - 1; i >= 0; i--) {
+    addFlame(flames, bombX, i)
+  }   
+  for (var i = bombY + 1; i < 8; i++) {
+    addFlame(flames, bombX, i)
+  }   
+}
+
 
 var colors = ["ffffff", "0000ff", "ff0000", "ffff00", "ff00ff", "00ffff"]
 var bman = function (state, event) {
@@ -87,13 +112,16 @@ var bman = function (state, event) {
   _.each(state.bombs, function (bomb, key) {
     bomb.fuse -= elapsed 
     if (bomb.fuse <= 0) {
+      addFlames(state.flames, bomb)
       bombsToDelete.push(key)
     }
   })
+
   _.each(bombsToDelete, function (key) {
     state.bombs[key].player.bombs += 1
     delete state.bombs[key]
   })
+
 
   return state;       
 }

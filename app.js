@@ -9,9 +9,9 @@ var event = {
 }
 
 var state = {
-  field: [],
   players: {},
-  bombs: {}
+  bombs: {},
+  flames: {}
 }
 
 io.sockets.on('connection', function (socket) {
@@ -82,6 +82,11 @@ var renderFrame = function (state) {
   _.each(state.bombs, function (bomb) {
     ret[(bomb.y) * 8 + (bomb.x)] = "404040"
   })
+
+  _.each(state.flames, function (flame) {
+    ret[(flame.y) * 8 + (flame.x)] = "ff7F00"
+  })
+
   return ret.join("")
   //return randomFrame();
 }

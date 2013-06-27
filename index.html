@@ -208,7 +208,16 @@ var thirdway = function () {
     socket.emit("gotoPoint", [pointX, pointY])
   }
 
-  document.body.ontouchstart = onTouch
+  document.body.ontouchstart = function (e) {
+    onTouch(e);
+    if (e.touches.length > 1) {
+      document.title = Date.now()
+      socket.emit("adown")
+      setTimeout(function () {
+        //socket.emit("aup")
+      }, 500)
+    }
+  }
   document.body.ontouchmove = onTouch
   document.body.ontouchend = function () {
     socket.emit("stopGoing") 
