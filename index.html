@@ -34,10 +34,7 @@ var render = function (frame) {
 
 var socket = io.connect('http://drewles.com:8012');
 var state
-socket.on("frame", function (frame) {
-  render(frame)
-  console.log(Date.now())
-})
+socket.on("frame", render)
 
 Mousetrap.bind("left", function () {
   socket.emit("leftdown")
@@ -71,11 +68,11 @@ Mousetrap.bind("down", function () {
   socket.emit("downup")
 }, 'keyup')
 
-Mousetrap.bind("a", function ( ){
+Mousetrap.bind("space", function ( ){
   socket.emit("adown")
 }, "keydown")
 
-Mousetrap.bind("a", function ( ){
+Mousetrap.bind("space", function ( ){
   socket.emit("aup")
 }, "keyup")
 

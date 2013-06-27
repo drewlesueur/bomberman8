@@ -48,7 +48,27 @@ var bman = function (state, event) {
       }
 
       if (playerEvent.a) {
-        state.bricks[player.x + "_" + player.y] = [player.x, player.y]
+        if (player.bombs && (event.time - player.bombTime > 100)) {
+          player.bombTime = event.time
+          console.log("BOMB")
+          var roundX = Math.round(player.x)
+          var roundY = Math.round(player.y)
+          var bombKey = roundX + "_" + roundY
+          if (bombKey in state.bombs) {
+
+          } else {
+            player.bombs = player.bombs - 1
+            state.bombs[bombKey] = {
+              x: roundX,
+              y: roundY,
+              start: event.time,
+              fuse: 2000,
+              fuseLength: 3000,
+              color: "404040",
+              player: player
+            }
+          }
+        } 
       }
     } else {
       //console.log("here! :( -- " + playerEvent.id)
@@ -56,10 +76,25 @@ var bman = function (state, event) {
         x: _.random(0, 7),
         y: _.random(0, 7),
         color: colors[_.random(0, colors.length - 1)],
-        moveRate: 1/75
+        moveRate: 1/75,
+        bombs: 3,
+        bombTime: 0
       }
     }
   })
+
+  var bombsToDelete = []
+  _.each(state.bombs, function (bomb, key) {
+    bomb.fuse -= elapsed 
+    if (bomb.fuse <= 0) {
+      bombsToDelete.push(key)
+    }
+  })
+  _.each(bombsToDelete, function (key) {
+    state.bombs[key].player.bombs += 1
+    delete state.bombs[key]
+  })
+
   return state;       
 }
 

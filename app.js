@@ -11,7 +11,7 @@ var event = {
 var state = {
   field: [],
   players: {},
-  bricks: {}
+  bombs: {}
 }
 
 io.sockets.on('connection', function (socket) {
@@ -79,18 +79,14 @@ var renderFrame = function (state) {
     ret[Math.round(player.y) * 8 + Math.round(player.x)] = player.color
   })
 
-  _.each(state.bricks, function (player) {
-    ret[Math.round(player[1]) * 8 + Math.round(player[0])] = "404040"
+  _.each(state.bombs, function (bomb) {
+    ret[(bomb.y) * 8 + (bomb.x)] = "404040"
   })
   return ret.join("")
   //return randomFrame();
 }
 
 tick(state, event);
-
-setInterval(function() {
-  state.bricks = {}
-}, 5000)
 
 
 process.on('uncaughtException', function(err) {
