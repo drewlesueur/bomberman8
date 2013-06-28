@@ -234,7 +234,7 @@ var thirdway = function () {
     e.preventDefault()
     var pointX = Math.floor(e.touches[0].pageX / pixelWidth)
     var pointY = Math.floor((e.touches[0].pageY) / (pixelHeight) )
-    socket.emit("gotoPoint", [pointX, pointY - 3])
+    socket.emit("gotoPoint", [pointX, pointY - 2])
   }
 
   document.body.ontouchstart = function (e) {
@@ -243,10 +243,25 @@ var thirdway = function () {
     }
     onTouch(e);
   }
-  document.body.ontouchmove = onTouch
-  document.body.ontouchend = function () {
+  
+  var moving = false;
+  document.body.ontouchmove = function (e) {
+    moving = true;
+    onTouch(e)
+  }
+
+  document.body.ontouchend = function (e) {
     socket.emit("stopGoing") 
+
+    if (moving == false && e.changedTouches.length == 1) {
+      socket.emit("adown") 
+      setTimeout(function () {
+        socket.emit("aup")
+      }, 200)
+    } else {
       socket.emit("aup")
+    }
+    moving = false;
   }
 }
 
