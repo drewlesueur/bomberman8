@@ -205,7 +205,7 @@ var thirdway = function () {
     e.preventDefault()
     var pointX = Math.floor(e.touches[0].pageX / pixelWidth)
     var pointY = Math.floor(e.touches[0].pageY / pixelHeight)
-    socket.emit("gotoPoint", [pointX, pointY])
+    socket.emit("gotoPoint", [pointX, pointY - 2])
   }
 
   document.body.ontouchstart = function (e) {
