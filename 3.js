@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -338,14 +337,41 @@ var sixthway = function () {
 }
 
 swipeway = function() {
+  var x = 0;
+  var y = 0;
+  document.body.ontouchstart = function (e) {
+    e.preventDefault();
+    x = e.touches[0].pageX 
+    y = e.touches[0].pageY 
+  }
 
+  document.body.ontouchmove = function (e) {
+    e.preventDefault()
+    newx = e.touches[0].pageX 
+    newy = e.touches[0].pageY 
+    var dx = newx - x
+    var dy = newy - y
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+      if (dx > 0) {
+        socket.emit("rightdown")
+      } else if (dx < 0) {
+        socket.emit("leftdown")
+      }
+    }
+  }
+   
+  document.body.ontouchend = function (e) {
+    e.preventDefault()
+    socket.emit("rightup")     
+  } 
+  
 }
 
 
 
 //sixthway();
 thirdway();
-//swipeway();
+swipeway();
 
 
 </script>

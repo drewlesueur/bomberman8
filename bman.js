@@ -133,6 +133,7 @@ var bman = function (state, event) {
         key: "0_0",
         color: colors[_.random(0, colors.length - 1)],
         moveRate: 1/50,
+        //moveRate: 1/100,
         bombs: 3,
         bombTime: 0
       }

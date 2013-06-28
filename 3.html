@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -11,25 +10,54 @@
 </style>
 </head>
 <body>
-<canvas id="c" width="640" height="640" style="width:320px; height:320px;"></canvas>
+<canvas style="image-rendering: -webkit-optimize-contrast; width:320px; height:320px;" id="c" width="8" height="8"></canvas>
+<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
+--<br />
 <script src="socket.io.js"></script>
 <script src="mousetrap.js"></script>
 <script>
+setTimeout(function () {
+  scrollTo(0, 0)
+}, 200)
 var canvasEl = document.getElementById("c")
 var c = canvasEl.getContext("2d")
-c.scale(2,2)
 c.fillRect(0,0,320,320)
 var pixelWidth = 320 / 8
 var pixelHeight = 320 / 8
+var imageData = c.createImageData(8, 8)
 var render = function (frame) {
-  frame = frame.replace(/\|/g, "")
   for (var y = 0; y < 8; y++) {
     for (var x = 0; x < 8; x++) {
       var color = frame.substr(((y * 8) + x) * 6, 6) 
-      c.fillStyle = "#" + color
-      c.fillRect(x*pixelWidth, y*pixelHeight, pixelWidth, pixelHeight)
+      var r = parseInt(color.substr(0, 2), 16)
+      var g = parseInt(color.substr(2, 2), 16)
+      var b = parseInt(color.substr(4, 2), 16)
+      index = (x + y * 8) * 4
+      imageData.data[index] = r
+      imageData.data[index + 1] = g
+      imageData.data[index + 2] = b
+      imageData.data[index + 3] = 255
     }
   }
+  c.putImageData(imageData, 0, 0)
 }
 
 var socket = io.connect('http://drewles.com:8012');
@@ -108,6 +136,7 @@ var oneway = function () {
   }
 
   document.body.ontouchstart = function (e) {
+    e.preventDefault();
     var dx = 0;
     var dy = 0;
     dx = getDx(e)
@@ -204,8 +233,8 @@ var thirdway = function () {
   var onTouch = function (e) {
     e.preventDefault()
     var pointX = Math.floor(e.touches[0].pageX / pixelWidth)
-    var pointY = Math.floor(e.touches[0].pageY / pixelHeight)
-    socket.emit("gotoPoint", [pointX, pointY - 2])
+    var pointY = Math.floor((e.touches[0].pageY) / (pixelHeight) )
+    socket.emit("gotoPoint", [pointX, pointY - 3])
   }
 
   document.body.ontouchstart = function (e) {
@@ -338,7 +367,62 @@ var sixthway = function () {
 }
 
 swipeway = function() {
+  var x = 0;
+  var y = 0;
+  document.body.ontouchstart = function (e) {
+    e.preventDefault();
+    x = e.touches[0].pageX 
+    y = e.touches[0].pageY 
+    dx = 0;
+    dy = 0;
 
+  }
+
+  var dx
+  var dy
+  var moving = false
+  document.body.ontouchmove = function (e) {
+    e.preventDefault()
+    newx = e.touches[0].pageX 
+    newy = e.touches[0].pageY 
+    dx = newx - x
+    dy = newy - y
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+
+      moving = true;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        socket.emit("downup")     
+        if (dx > 0) {
+          socket.emit("rightdown")
+        } else if (dx < 0) {
+          socket.emit("leftdown")
+        }
+      } else {
+        socket.emit("rightup")     
+        if (dy > 0) {
+          socket.emit("downdown")
+        } else if (dy < 0) {
+          socket.emit("updown")
+        }
+      }
+
+    }
+  }
+   
+  document.body.ontouchend = function (e) {
+    e.preventDefault()
+    socket.emit("aup")
+    if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+      if (moving == false) {
+        socket.emit("adown")
+        setTimeout(function () { socket.emit("aup")}, 200)
+      }
+      moving = false
+      socket.emit("rightup")     
+      socket.emit("downup")     
+    }
+  } 
+  
 }
 
 
@@ -346,6 +430,9 @@ swipeway = function() {
 //sixthway();
 thirdway();
 //swipeway();
+//oneway()
+
+
 
 
 </script>
