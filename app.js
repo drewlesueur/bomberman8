@@ -2,8 +2,9 @@
 _ = require("./underscore.js")
 var io = require('socket.io').listen(8012, {log: false});
 
-var pixelWidth = 16
-var pixelHeight = 16
+var dimension = 16
+var pixelWidth = dimension
+var pixelHeight = dimension
 var pixelArea = pixelWidth * pixelHeight
 
 var bman = require("./bman.js")

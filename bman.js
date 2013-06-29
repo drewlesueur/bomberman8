@@ -1,7 +1,7 @@
 _ = require("./underscore.js")
-
-var pixelWidth = 16
-var pixelHeight = 16
+var dimension = 16
+var pixelWidth = dimension
+var pixelHeight = dimension
 var pixelWidthMinus1 = pixelWidth - 1
 
 
@@ -10,7 +10,7 @@ var movedValue = function (elapsed, dx, x, rate) {
 }
 
 var maxed = function (x) {
-  return x < 0 ? 0 : x >= pixelWidth ? pixelWidthMinus1 : x
+  return x < 0 ? 0 : x > pixelWidthMinus1 ? pixelWidthMinus1 : x
 }
 
 var moveGoing = function (elapsed, goingX, x, rate) {
