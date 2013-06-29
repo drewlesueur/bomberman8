@@ -26,7 +26,7 @@ var state = {
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s")
   event.players[id] = {dx: 0, dy: 0, id: id}
-  socket.emit("frame", "ff0000") 
+  socket.emit("frame", "f00") 
   socket.on('leftdown', function () { event.players[id].dx = -1; });
   socket.on('leftup', function () { event.players[id].dx = 0; });
   socket.on('rightdown', function () { event.players[id].dx = 1; });
@@ -82,18 +82,18 @@ var lastFrame = ""
 var renderFrame = function (state) { 
   var ret = [];
   for (var i = 0; i < pixelArea; i ++) {
-    ret[i] = "00aa00"
+    ret[i] = "0a0"
   }
   _.each(state.players, function (player) {
     ret[player.roundY * pixelHeight + player.roundX] = player.color
   })
 
   _.each(state.bombs, function (bomb) {
-    ret[(bomb.y) * pixelHeight + (bomb.x)] = "404040"
+    ret[(bomb.y) * pixelHeight + (bomb.x)] = "444"
   })
 
   _.each(state.flames, function (flame) {
-    ret[(flame.y) * pixelHeight + (flame.x)] = "ff7F00"
+    ret[(flame.y) * pixelHeight + (flame.x)] = "f70"
   })
 
   return ret.join("")

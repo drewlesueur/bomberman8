@@ -1,0 +1,5 @@
+it seems that using objects is faster than the arrays?
+
+like (x + "_" * y) as a key is faster than (y * height + x)?
+
+maybe I need to use typed arrays?

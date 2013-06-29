@@ -31,7 +31,7 @@ var addFlame = function(state, x, y) {
     }
     if (flameKey in state.playerPos) {
       _.each(state.playerPos[flameKey], function (player){
-        player.color = "7f7f7f"
+        player.color = "777"
         player.bombs = -1
       })
     }
@@ -71,7 +71,7 @@ var setPlayerPos = function (state, player, x, y) {
   var key = x + "_" + y
   
 } 
-var colors = ["ffffff", "0000ff", "ff0000", "ffff00", "ff00ff", "00ffff"]
+var colors = ["fff", "00f", "f00", "ff00", "f0f", "0ff"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
   //console.log("players!")
@@ -121,7 +121,7 @@ var bman = function (state, event) {
               start: event.time,
               fuse: 2000,
               fuseLength: 3000,
-              color: "404040",
+              color: "444",
               player: player
             }
           }
