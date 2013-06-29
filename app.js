@@ -16,11 +16,12 @@ var event = {
 
 var state = {
   players: {},
-  bombs: {},
-  flames: {},
-  objects: {},
-  playersPos: {}
+  bombs: new Array(pixelArea),
+  flames: new Array(pixelArea),
+  objects: new Array(pixelArea),
+  playersPos: new Array(pixelArea)
 }
+
 
 
 io.sockets.on('connection', function (socket) {

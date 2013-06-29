@@ -25,7 +25,7 @@ var moveGoing = function (elapsed, goingX, x, rate) {
 var addFlame = function(state, x, y) {
     var flames = state.flames
     var bombs = state.bombs
-    var flameKey = x + "_" + y
+    var flameKey = y * pixelHeight + x
     if (flameKey in bombs) {
       detinateBomb(state, bombs[flameKey], flameKey)
     }
@@ -68,7 +68,7 @@ var detinateBomb = function (state, bomb, key) {
 }
 
 var setPlayerPos = function (state, player, x, y) {
-  var key = x + "_" + y
+  var key = y * pixelHeight + x
   
 } 
 var colors = ["ffffff", "0000ff", "ff0000", "ffff00", "ff00ff", "00ffff"]
@@ -102,7 +102,7 @@ var bman = function (state, event) {
       var roundY = Math.round(player.y)
       player.roundX = roundX
       player.roundY = roundY
-      player.key = roundX + "_" + roundY
+      player.key = roundY * pixelHeight + roundX
       
       setPlayerPos(state, player, roundX, roundY)
       
@@ -110,7 +110,7 @@ var bman = function (state, event) {
       if (playerEvent.a) {
         if (player.bombs > 0 && (event.time - player.bombTime > 100)) {
           player.bombTime = event.time
-          var bombKey = roundX + "_" + roundY
+          var bombKey = roundY * pixelHeight + roundX
           if (bombKey in state.bombs) {
 
           } else {
