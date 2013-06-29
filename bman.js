@@ -72,7 +72,51 @@ var setPlayerPos = function (state, player, x, y) {
   
 } 
 var colors = ["fff", "00f", "f00", "ff0", "f0f", "0ff"]
-var bman = function (state, event) {
+
+var bman = {};
+bman.playerMoveX = function (state, id, direction) {
+
+} 
+
+bman.playerMoveY = function (state, id, direction) {
+
+} 
+
+bman.playerGoto = function (state, id, point) {
+
+} 
+
+bman.playerStop = function (state, id, point) {
+
+} 
+
+bman.aDown = function (state, id) {
+
+} 
+
+bman.aUp = function (state) {
+
+} 
+
+bman.onTime = function (state, timeEvent) {
+
+} 
+
+bman.onDisconnect = function (state) {
+
+} 
+
+bman.onConnect = function (state, id) {
+  state.players[id] = {
+    x: 0,
+    y: 0,
+    color: "f00",
+    image: "bomber"
+  }
+  state.changesInWhereThingsAre[id] = {x: 0, y: 0, image: "bomber"}
+} 
+
+var bmanOld = function (state, event) {
   var elapsed = event.elapsed
   //console.log("players!")
   //console.log(state.players)

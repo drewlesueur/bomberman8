@@ -1,6 +1,6 @@
 // todo: event stream vs event state
 _ = require("./underscore.js")
-var io = require('socket.io').listen(8012, {log: false});
+var io = require('socket.io').listen(8013, {log: false});
 
 var dimension = 16
 var pixelWidth = dimension
@@ -19,7 +19,8 @@ var state = {
   bombs: {},
   flames: {},
   objects: {},
-  playersPos: {}
+  playersPos: {},
+  changesInWhereThingsAre: {}
 }
 
 playerMoveX = bman.playerMoveX
@@ -29,12 +30,15 @@ playerStop = bman.playerSotp
 aDown = bman.aDown
 aUp = bman.aUp
 onTime = bman.onTime
+onDisconnect = bman.onDisconnect
+onConnect = bman.onConnect
 
 var events = {}
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s")
-  event.players[id] = {dx: 0, dy: 0, id: id}
-  socket.emit("frame", "f00") 
+
+  onConnect(sate, id)
+
   // is all this binding slow?
   socket.on('leftdown', function () {
      playerMoveX.bind(state, id, -1)
@@ -78,8 +82,7 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on("disconnect", function () {
-    delete event[id]
-    event.disconnected.push(id)
+    onDisconnected(state, id)
   })
 });
 
@@ -88,51 +91,18 @@ var tick = function (state, timeEvent) {
   timeEvent.elapsed = now - timeEvent.time
   timeEvent.time = now
   onTime(state, timeEvent) 
-  var changes = state.where_things_are_changes
+  var changes = state.changesInWhereThingsAre
   if (changes) {
-    io.sockets.emit("wtac", changes) //wtac where-things-are changes
+    io.sockets.emit("ciwta", changes) //changes in where things are
   }
+  state.changesInWhereThingsAre = {}
   setTimeout(function() {
     tick(state, timeEvent)
   }, 32) 
 }
 
-var randomColor = function () {
-  return _.random(0, 0xFFFFFF).toString(16)
-}
 
-var randomFrame = function () {
-  var str = ""
-  var color = randomColor()
-  for (var i = 0; i < pixelArea; i++) {
-    //str += randomColor();
-    str += color;
-  }
-  return str;
-}
-
-var lastFrame = ""
-var renderFrame = function (state) { 
-  var ret = {};
-  _.each(state.players, function (player) {
-    ret[player.roundX + "_" + player.roundY] = player.color
-  })
-
-  _.each(state.bombs, function (bomb) {
-    ret[(bomb.x)  + "_" + (bomb.y)] = "444"
-  })
-
-  _.each(state.flames, function (flame) {
-    ret[(flame.x) + "_" + (flame.y)] = "f70"
-  })
-
-  return ret
-  //return randomFrame();
-}
-
-var timeEvent = {
-  time: Date.now()
-}
+var timeEvent = { time: Date.now() }
 tick(state, timeEvent);
 
 
