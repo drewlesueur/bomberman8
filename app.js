@@ -26,7 +26,7 @@ var state = {
 playerMoveX = bman.playerMoveX
 playerMoveY = bman.playerMoveY
 playerGoto = bman.playerGoto
-playerStop = bman.playerSotp
+playerStop = bman.playerStop
 aDown = bman.aDown
 aUp = bman.aUp
 onTime = bman.onTime
@@ -35,44 +35,43 @@ onConnect = bman.onConnect
 
 var events = {}
 io.sockets.on('connection', function (socket) {
-  var id = _.uniqueId("s")
+  var id = _.uniqueId("s") // TODO? use a numeric id and make it an array?
 
   onConnect(state, id)
 
-  // is all this binding slow?
   socket.on('leftdown', function () {
-     playerMoveX.bind(state, id, -1)
+     playerMoveX(state, id, -1)
   });
   socket.on('leftup', function () {
-     playerMoveX.bind(state, id, 0)
+     playerMoveX(state, id, 0)
   });
   socket.on('rightdown', function () {
-     playerMoveX.bind(state, id, 1)
+     playerMoveX(state, id, 1)
   });
 
   socket.on('rightup', function () {
-    playerMoveX.bind(state, id, 0)
+    playerMoveX(state, id, 0)
   });
 
   socket.on('updown', function () {
-    playerMoveY.bind(state, id, -1)
+    playerMoveY(state, id, -1)
   });
   socket.on('upup', function () {
-    playerMoveY.bind(state, id, 0)
+    playerMoveY(state, id, 0)
   });
   socket.on('downdown', function () {
-    playerMoveY.bind(state, id, 1)
+    playerMoveY(state, id, 1)
   });
 
   socket.on('downup', function () {
-    playerMoveY.bind(state, id, 0)
+    playerMoveY(state, id, 0)
   });
 
   socket.on("gotoPoint", function (point) {
-    playerGoto.bind(state, id, point)
+    playerGoto(state, id, point)
   })
   socket.on("stopGoing", function (point) {
-    playerStop.bind(state, id, point)
+    playerStop(state, id, point)
   })
   socket.on("adown", function (point) {
     aDown(state, id, point)
@@ -82,7 +81,7 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on("disconnect", function () {
-    onDisconnected(state, id)
+    onDisconnect(state, id)
   })
 });
 
@@ -92,13 +91,14 @@ var tick = function (state, timeEvent) {
   timeEvent.time = now
   onTime(state, timeEvent) 
   var changes = state.changesInWhereThingsAre
-  if (changes) {
+  if (state.hasChanges) {
     io.sockets.emit("ciwta", changes) //changes in where things are
   }
+  state.hasChanges = false
   state.changesInWhereThingsAre = {}
   setTimeout(function() {
     tick(state, timeEvent)
-  }, 32) 
+  }, 16) 
 }
 
 

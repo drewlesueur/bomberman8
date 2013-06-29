@@ -1,5 +1,6 @@
 _ = require("./underscore.js")
-var dimension = 16
+
+var dimension = 320
 var pixelWidth = dimension
 var pixelHeight = dimension
 var pixelWidthMinus1 = pixelWidth - 1
@@ -13,12 +14,14 @@ var maxed = function (x) {
   return x < 0 ? 0 : x > pixelWidthMinus1 ? pixelWidthMinus1 : x
 }
 
-var moveGoing = function (elapsed, goingX, x, rate) {
-  var roundedX = Math.round(x)
-  var dx = goingX < roundedX ? -1 : goingX > roundedX ? 1 : 0
+var moveGoing = function (elapsed, dx, goingX, x, rate) {
+  newX =  x + (elapsed * rate * dx)
+
+  //var roundedX = Math.round(x)
+  var roundedX = x
   newX = (rate * elapsed * dx) + x
-  if (dx < 1 && newX < goingX) newX = goingX
-  if (dx > 1 && newX > goingX) newX = goingX
+  if (dx < 1 && newX <= goingX) newX = goingX
+  if (dx > 1 && newX >= goingX) newX = goingX
   return newX
 }
 
@@ -74,20 +77,98 @@ var setPlayerPos = function (state, player, x, y) {
 var colors = ["fff", "00f", "f00", "ff0", "f0f", "0ff"]
 
 var bman = {};
-bman.playerMoveX = function (state, id, direction) {
+bman.onTime = function (state, timeEvent) {
+  var elapsed = timeEvent.elapsed
+  _.each(state.players, function (player, playerId) {
+      if (player.dx != 0 || player.dy != 0) {
 
+        player.x = maxed(movedValue(elapsed, player.dx, player.x, player.moveRate))
+        player.y = maxed(movedValue(elapsed, player.dy, player.y, player.moveRate))
+
+        // it might be already maxed out but oh well
+        state.hasChanges = true
+        // TODO: round?
+        state.changesInWhereThingsAre[playerId] = Math.round(player.x) + "_" + Math.round(player.y) + "_" + player.img
+      }
+
+      var going = player.going
+      if (going) {
+        // todo. just set dx and dy earler and here just determine when to stop
+        var goingX = going[0]
+        var goingY = going[1]
+        if (player.dx == -1 && player.x < goingX) {
+          player.dx = 0 
+          player.x = goingX
+        } else if (player.dx == 1 && player.x > goingX) {
+          player.dx = 0 
+          player.x = goingX
+        }
+
+        if (player.dy == -1 && player.y < goingY) {
+          player.dy = 0 
+          player.y = goingY
+        } else if (player.dy == 1 && player.y > goingY) {
+          player.dy = 0 
+          player.y = goingY
+        }
+
+        state.hasChanges = true
+        state.changesInWhereThingsAre[playerId] = Math.round(player.x) + "_" + Math.round(player.y) + "_" + player.img
+      }
+  }) 
+
+
+          /*
+      var going = playerEvent.going
+      if (going) {
+        var goingX = going[0]
+        var goingY = going[1]
+        player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
+        player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
+      }
+      var roundX = Math.round(player.x)
+      var roundY = Math.round(player.y)
+      player.roundX = roundX
+      player.roundY = roundY
+      player.key = roundX + "_" + roundY
+      
+      setPlayerPos(state, player, roundX, roundY)
+      */
+   
+} 
+
+bman.playerMoveX = function (state, id, direction) {
+  state.players[id].dx = direction
 } 
 
 bman.playerMoveY = function (state, id, direction) {
-
+  state.players[id].dy = direction
 } 
 
 bman.playerGoto = function (state, id, point) {
+  player = state.players[id]
+  player.going = point
+  if (point[0] > player.x) {
+    player.dx = 1
+  } else if (point[0] < player.x) {
+    player.dx = -1
+  } else {
+    player.dx = 0
+  }
 
+  if (point[1] > player.y) {
+    player.dy = 1
+  } else if (point[1] < player.y) {
+    player.dy = -1
+  } else {
+    player.dy = 0
+  }
 } 
 
 bman.playerStop = function (state, id, point) {
-
+  state.players[id].going = false
+  state.players[id].dx = 0
+  state.players[id].dy = 0
 } 
 
 bman.aDown = function (state, id) {
@@ -98,9 +179,6 @@ bman.aUp = function (state) {
 
 } 
 
-bman.onTime = function (state, timeEvent) {
-
-} 
 
 bman.onDisconnect = function (state) {
 
@@ -111,9 +189,13 @@ bman.onConnect = function (state, id) {
     x: 0,
     y: 0,
     color: "f00",
-    image: "bomber"
+    img: "bomber",
+    moveRate: 1,
+    dx: 0,
+    dy: 0
   }
-  state.changesInWhereThingsAre[id] = {x: 0, y: 0, img: "bomber"}
+  state.changesInWhereThingsAre[id] = "0_0_bomber"
+  state.hasChanges = true
 } 
 
 var bmanOld = function (state, event) {

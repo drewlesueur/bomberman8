@@ -67,7 +67,11 @@ var render = function (whereThingsAre) {
   for (key in whereThingsAre) {
     var thing = whereThingsAre[key]
     c.fillStyle = "#000000"    
-    c.fillRect(thing.x, thing.y, 30, 30)
+    var info = thing.split("_")
+    x = info[0]
+    y = info[1]
+    img = info[2]
+    c.fillRect(x, y, 30, 30)
   }
 
   /*
@@ -90,6 +94,7 @@ var socket = io.connect('http://drewles.com:8013');
 var state
 var whereThingsAre = {}
 socket.on("ciwta", function (changes) {
+  console.log(changes)
   var len = changes.length
   for (key in changes) { // ordering? of where stuff is aka z-index
     var change = changes[key]; 
@@ -272,9 +277,9 @@ var otherway = function () {
 var thirdway = function () {
   var onTouch = function (e) {
     e.preventDefault()
-    var pointX = Math.floor(e.touches[0].pageX / scaledPixelWidth)
-    var pointY = Math.floor((e.touches[0].pageY) / (scaledPixelHeight) )
-    socket.emit("gotoPoint", [pointX, pointY - 2])
+    var pointX = Math.floor(e.touches[0].pageX)
+    var pointY = Math.floor((e.touches[0].pageY))
+    socket.emit("gotoPoint", [pointX, pointY - 100])
   }
 
   document.body.ontouchstart = function (e) {
