@@ -72,7 +72,8 @@ var socket = io.connect('http://drewles.com:8012');
 var state
 socket.on("frame", render)
 
-Mousetrap.bind("left", function () {
+Mousetrap.bind("left", function (e) {
+  e.preventDefault()
   socket.emit("leftdown")
 }, 'keydown')
 
@@ -80,7 +81,8 @@ Mousetrap.bind("left", function () {
   socket.emit("leftup")
 }, 'keyup')
 
-Mousetrap.bind("right", function () {
+Mousetrap.bind("right", function (e) {
+  e.preventDefault()
   socket.emit("rightdown")
 }, 'keydown')
 
@@ -88,7 +90,8 @@ Mousetrap.bind("right", function () {
   socket.emit("rightup")
 }, 'keyup')
 
-Mousetrap.bind("up", function () {
+Mousetrap.bind("up", function (e) {
+  e.preventDefault()
   socket.emit("updown")
 }, 'keydown')
 
@@ -96,7 +99,8 @@ Mousetrap.bind("up", function () {
   socket.emit("upup")
 }, 'keyup')
 
-Mousetrap.bind("down", function () {
+Mousetrap.bind("down", function (e) {
+  e.preventDefault()
   socket.emit("downdown")
 }, 'keydown')
 
@@ -104,7 +108,8 @@ Mousetrap.bind("down", function () {
   socket.emit("downup")
 }, 'keyup')
 
-Mousetrap.bind("space", function ( ){
+Mousetrap.bind("space", function (e){
+  e.preventDefault()
   socket.emit("adown")
 }, "keydown")
 
