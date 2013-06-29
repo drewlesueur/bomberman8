@@ -37,7 +37,7 @@ var events = {}
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s")
 
-  onConnect(sate, id)
+  onConnect(state, id)
 
   // is all this binding slow?
   socket.on('leftdown', function () {

@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -60,28 +59,18 @@ c.scale(2,2)
 setTimeout(function () {
 
 }, 2000)
-var imageData = c.createImageData(pixelWidth, pixelHeight)
-var render_old = function (frame) {
-  c.filStyle = "#0a0"
-  c.fillRect(0, 0, viewWidth, viewHeight)
-  for (var y = 0; y < pixelHeight; y++) {
-    for (var x = 0; x < pixelWidth; x++) {
-      var color = frame.substr(((y * pixelHeight) + x) * 3, 3) 
-      if (color == "444") {
 
-        c.drawImage(bomb, x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
-      } else {
-        c.fillStyle = "#" + color
-        c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
-      }
-    }
-  }
-}
-
-var render = function (frame) {
+var render = function (whereThingsAre) {
   c.fillStyle = "#0a0"
   c.fillRect(0, 0, viewWidth, viewHeight)
 
+  for (key in whereThingsAre) {
+    var thing = whereThingsAre[key]
+    c.fillStyle = "#000000"    
+    c.fillRect(thing.x, thing.y, 30, 30)
+  }
+
+  /*
   for (key in frame) {
       var vals = key.split("_")
       var x = vals[0] - 0
@@ -94,11 +83,21 @@ var render = function (frame) {
         c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
       }
   }
+  */
 }
 
-var socket = io.connect('http://drewles.com:8012');
+var socket = io.connect('http://drewles.com:8013');
 var state
-socket.on("frame", render)
+var whereThingsAre = {}
+socket.on("ciwta", function (changes) {
+  var len = changes.length
+  for (key in changes) { // ordering? of where stuff is aka z-index
+    var change = changes[key]; 
+    if (!change) delete whereThingsAre[key]
+    else whereThingsAre[key] = change
+  }  
+  render(whereThingsAre)
+})
 
 Mousetrap.bind("left", function (e) {
   e.preventDefault()

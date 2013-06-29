@@ -113,7 +113,7 @@ bman.onConnect = function (state, id) {
     color: "f00",
     image: "bomber"
   }
-  state.changesInWhereThingsAre[id] = {x: 0, y: 0, image: "bomber"}
+  state.changesInWhereThingsAre[id] = {x: 0, y: 0, img: "bomber"}
 } 
 
 var bmanOld = function (state, event) {
