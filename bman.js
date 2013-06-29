@@ -71,7 +71,7 @@ var setPlayerPos = function (state, player, x, y) {
   var key = x + "_" + y
   
 } 
-var colors = ["fff", "00f", "f00", "ff00", "f0f", "0ff"]
+var colors = ["fff", "00f", "f00", "ff0", "f0f", "0ff"]
 var bman = function (state, event) {
   var elapsed = event.elapsed
   //console.log("players!")
