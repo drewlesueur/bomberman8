@@ -2,6 +2,8 @@ _ = require("./underscore.js")
 
 var dimension = 320
 var gridDimension = 16
+var gridUnitWidth = dimension / gridDimension
+var gridUnitHeight = dimension / gridDimension
 var pixelWidth = dimension
 var pixelHeight = dimension
 var pixelWidthMinus1 = pixelWidth - 1
@@ -91,20 +93,22 @@ var generateChange = function (item) {
     item.img
 }
 
-var getGridValue = function (x, w, originX, gridDimension) {
+var getGridValue = function (x, w, originX, gridValue) {
   var midX = x + originX
-  return Math.floor(midX / gridDimension)
+  return Math.floor(midX / gridValue)
 }
 
 var bman = {};
 bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
+  //state.elapsed = timeEvent.elapsed // you might need this?
+  state.time = timeEvent.time
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
         player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
         player.y = maxed(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
-        player.gridX = getGridValue(player.x, player.w, player.originX, gridDimension)
-        player.gridY = getGridValue(player.y, player.h, player.originY, gridDimension)
+        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         setplayersPos(state, player, player.gridX, player.gridY)
 
         // it might be already maxed out but oh well
@@ -133,13 +137,16 @@ bman.onTime = function (state, timeEvent) {
           player.y = goingY
         }
         // TODO: hthis might not have changed, you could prob optimize this
-        player.gridX = getGridValue(player.x, player.w, player.originX, gridDimension)
-        player.gridY = getGridValue(player.y, player.h, player.originY, gridDimension)
+        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         setplayersPos(state, player, player.gridX, player.gridY)
 
         state.hasChanges = true
+        // todo: maybe have a global where things are
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
+
+        
   }) 
 } 
 
@@ -180,7 +187,41 @@ bman.playerStop = function (state, id, point) {
 } 
 
 bman.aDown = function (state, id) {
+  var player = state.players[id]
+  var x = player.gridX
+  var y = player.gridY
+  if (player.bombs > 0 && (state.time - player.bombTime > 100)) {
+    player.bombTime = state.time
+    var bombKey = x + "_" + y
+    if (bombKey in state.bombs) {
 
+    } else {
+      // was here
+      player.bombs = player.bombs - 1
+      var bombId = _.uniqueId("b")
+      var bomb = {
+        id: bombId, // b for bomb
+        x: x * gridUnitWidth,
+        y: y * gridUnitHeight,
+        gridX: x,
+        gridY: y,
+        w: 20,
+        h: 20,
+        originX: 10,
+        originY: 10,
+        img: "bomb",
+        start: state.time,
+        fuse: 2000,
+        fuseLength: 3000,
+        color: "444",
+        player: player
+      }
+
+      state.bombs[bombKey] = bomb
+      state.hasChanges = true
+      state.changesInWhereThingsAre[bombId] = generateChange(bomb)
+    }
+  } 
 } 
 
 bman.aUp = function (state) {
@@ -203,7 +244,9 @@ bman.onConnect = function (state, id) {
     dx: 0,
     dy: 0,
     w: 20,
-    h: 20
+    h: 20,
+    bombs: 10,
+    bombTime: 0
   }
   state.changesInWhereThingsAre[id] = "0_0_20_20_b"
   state.hasChanges = true
