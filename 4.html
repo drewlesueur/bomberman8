@@ -37,12 +37,14 @@
 <script src="socket.io.js"></script>
 <script src="mousetrap.js"></script>
 <script>
+var bomb = new Image()
+bomb.src = "http://www.veryicon.com/icon/png/Movie%20%26%20TV/Danger%20Mouse/Bomb.png"
 setTimeout(function () {
   scrollTo(0, 0)
 }, 200)
 var canvasEl = document.getElementById("c")
-var viewWidth = 640
-var viewHeight = 640
+var viewWidth = 320
+var viewHeight = 320
 var dimension = 16
 var pixelWidth = dimension
 var pixelHeight = dimension
@@ -54,14 +56,24 @@ canvasEl.style.width = viewWidth + "px"
 canvasEl.style.height = viewHeight + "px"
 var c = canvasEl.getContext("2d")
 c.scale(2,2)
-c.fillRect(0,0,viewWidth,viewHeight)
+//c.fillRect(0,0,viewWidth,viewHeight)
+setTimeout(function () {
+
+}, 2000)
 var imageData = c.createImageData(pixelWidth, pixelHeight)
 var render = function (frame) {
+  c.filStyle = "#0a0"
+  c.fillRect(0, 0, viewWidth, viewHeight)
   for (var y = 0; y < pixelHeight; y++) {
     for (var x = 0; x < pixelWidth; x++) {
       var color = frame.substr(((y * pixelHeight) + x) * 3, 3) 
-      c.fillStyle = "#" + color
-      c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
+      if (color == "444") {
+
+        c.drawImage(bomb, x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
+      } else {
+        c.fillStyle = "#" + color
+        c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
+      }
     }
   }
 }
