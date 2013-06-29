@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -7,19 +8,12 @@
     padding: 0;
     margin: 0;
   }
-canvas {
-    image-rendering: optimizeSpeed;             // Older versions of FF
-    image-rendering: -moz-crisp-edges;          // FF 6.0+
-    image-rendering: -webkit-optimize-contrast; // Webkit
-                                                //  (Safari now, Chrome soon)
-    image-rendering: -o-crisp-edges;            // OS X & Windows Opera (12.02+)
-    image-rendering: optimize-contrast;         // Possible future browsers.
-    -ms-interpolation-mode: nearest-neighbor;   // IE
-}
 </style>
 </head>
 <body>
+<div align="center">
 <canvas style="image-rendering: optimize-contrast; image-rendering: -webkit-optimize-contrast; width:320px; height:320px;" id="c" width="16" height="16"></canvas>
+</div>
 <br />
 --<br />
 --<br />
@@ -47,36 +41,29 @@ setTimeout(function () {
   scrollTo(0, 0)
 }, 200)
 var canvasEl = document.getElementById("c")
-var viewWidth = 320
-var viewHeight = 320
+var viewWidth = 640
+var viewHeight = 640
 var dimension = 16
 var pixelWidth = dimension
 var pixelHeight = dimension
 var scaledPixelWidth = viewWidth / pixelWidth
 var scaledPixelHeight = viewHeight / pixelHeight
-canvasEl.width = pixelWidth
-canvasEl.height = pixelHeight
+canvasEl.width = viewWidth * 2
+canvasEl.height = viewHeight * 2
 canvasEl.style.width = viewWidth + "px"
 canvasEl.style.height = viewHeight + "px"
 var c = canvasEl.getContext("2d")
+c.scale(2,2)
 c.fillRect(0,0,viewWidth,viewHeight)
 var imageData = c.createImageData(pixelWidth, pixelHeight)
 var render = function (frame) {
-  window.frame = frame
   for (var y = 0; y < pixelHeight; y++) {
     for (var x = 0; x < pixelWidth; x++) {
       var color = frame.substr(((y * pixelHeight) + x) * 3, 3) 
-      var r = parseInt(color.substr(0, 1) , 16)
-      var g = parseInt(color.substr(1, 1) , 16)
-      var b = parseInt(color.substr(2, 1) , 16)
-      index = (x + y * pixelHeight) * 4
-      imageData.data[index] = r * 16
-      imageData.data[index + 1] = g * 16
-      imageData.data[index + 2] = b * 16
-      imageData.data[index + 3] = 255
+      c.fillStyle = "#" + color
+      c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
     }
   }
-  c.putImageData(imageData, 0, 0)
 }
 
 var socket = io.connect('http://drewles.com:8012');
