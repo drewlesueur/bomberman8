@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -68,12 +69,10 @@ var render = function (whereThingsAre) {
     var thing = whereThingsAre[key]
     c.fillStyle = "#000000"    
     var info = thing.split("_")
-    var x = info[0]
-    var y = info[1]
-    var w = info[2]
-    var h = info[3]
-    var img = info[4]
-    c.fillRect(x, y, w, h)
+    x = info[0]
+    y = info[1]
+    img = info[2]
+    c.fillRect(x, y, 30, 30)
   }
 
   /*
@@ -490,9 +489,9 @@ swipeway = function() {
 
 
 //sixthway();
-thirdway();
+//thirdway();
 //fifthway();
-//swipeway();
+swipeway();
 //oneway()
 
 

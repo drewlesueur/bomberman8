@@ -1,4 +1,5 @@
-// todo: event stream vs event state
+// todo: since you are only sending changes, for new connections,
+// send the whole state
 _ = require("./underscore.js")
 var io = require('socket.io').listen(8013, {log: false});
 

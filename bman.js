@@ -10,8 +10,9 @@ var movedValue = function (elapsed, dx, x, rate) {
   return (rate * elapsed * dx) + x
 }
 
-var maxed = function (x) {
-  return x < 0 ? 0 : x > pixelWidthMinus1 ? pixelWidthMinus1 : x
+var maxed = function (w, x) {
+  var maxX = pixelWidth - w
+  return x < 0 ? 0 : x > maxX ? maxX : x
 }
 
 var moveGoing = function (elapsed, dx, goingX, x, rate) {
@@ -76,19 +77,26 @@ var setPlayerPos = function (state, player, x, y) {
 } 
 var colors = ["fff", "00f", "f00", "ff0", "f0f", "0ff"]
 
+var generateChange = function (item) {
+  return Math.round(item.x) + "_" +
+    Math.round(item.y) + "_" + 
+    item.w + "_" +
+    item.h + "_" +
+    item.img
+}
+
 var bman = {};
 bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
-
-        player.x = maxed(movedValue(elapsed, player.dx, player.x, player.moveRate))
-        player.y = maxed(movedValue(elapsed, player.dy, player.y, player.moveRate))
+        player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
+        player.y = maxed(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
 
         // it might be already maxed out but oh well
         state.hasChanges = true
         // TODO: round?
-        state.changesInWhereThingsAre[playerId] = Math.round(player.x) + "_" + Math.round(player.y) + "_" + player.img
+        state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
 
       var going = player.going
@@ -113,7 +121,7 @@ bman.onTime = function (state, timeEvent) {
         }
 
         state.hasChanges = true
-        state.changesInWhereThingsAre[playerId] = Math.round(player.x) + "_" + Math.round(player.y) + "_" + player.img
+        state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
   }) 
 
@@ -147,6 +155,8 @@ bman.playerMoveY = function (state, id, direction) {
 
 bman.playerGoto = function (state, id, point) {
   player = state.players[id]
+  point[0] = Math.round(point[0] - (player.w / 2))
+  point[1] = Math.round(point[1] - (player.h / 2))
   player.going = point
   if (point[0] > player.x) {
     player.dx = 1
@@ -189,12 +199,14 @@ bman.onConnect = function (state, id) {
     x: 0,
     y: 0,
     color: "f00",
-    img: "bomber",
+    img: "b",
     moveRate: 1,
     dx: 0,
-    dy: 0
+    dy: 0,
+    w: 20,
+    h: 20
   }
-  state.changesInWhereThingsAre[id] = "0_0_bomber"
+  state.changesInWhereThingsAre[id] = "0_0_20_20_b"
   state.hasChanges = true
 } 
 
