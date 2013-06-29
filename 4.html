@@ -61,7 +61,7 @@ setTimeout(function () {
 
 }, 2000)
 var imageData = c.createImageData(pixelWidth, pixelHeight)
-var render = function (frame) {
+var render_old = function (frame) {
   c.filStyle = "#0a0"
   c.fillRect(0, 0, viewWidth, viewHeight)
   for (var y = 0; y < pixelHeight; y++) {
@@ -75,6 +75,24 @@ var render = function (frame) {
         c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
       }
     }
+  }
+}
+
+var render = function (frame) {
+  c.fillStyle = "#0a0"
+  c.fillRect(0, 0, viewWidth, viewHeight)
+
+  for (key in frame) {
+      var vals = key.split("_")
+      var x = vals[0] - 0
+      var y = vals[1] - 0
+      var color = frame[key] 
+      if (color == "444") {
+        c.drawImage(bomb, x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
+      } else {
+        c.fillStyle = "#" + color
+        c.fillRect(x*scaledPixelWidth, y*scaledPixelHeight, scaledPixelWidth, scaledPixelHeight)
+      }
   }
 }
 

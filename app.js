@@ -80,23 +80,20 @@ var randomFrame = function () {
 
 var lastFrame = ""
 var renderFrame = function (state) { 
-  var ret = [];
-  for (var i = 0; i < pixelArea; i ++) {
-    ret[i] = "0a0"
-  }
+  var ret = {};
   _.each(state.players, function (player) {
-    ret[player.roundY * pixelHeight + player.roundX] = player.color
+    ret[player.roundX + "_" + player.roundY] = player.color
   })
 
   _.each(state.bombs, function (bomb) {
-    ret[(bomb.y) * pixelHeight + (bomb.x)] = "444"
+    ret[(bomb.x)  + "_" + (bomb.y)] = "444"
   })
 
   _.each(state.flames, function (flame) {
-    ret[(flame.y) * pixelHeight + (flame.x)] = "f70"
+    ret[(flame.x) + "_" + (flame.y)] = "f70"
   })
 
-  return ret.join("")
+  return ret
   //return randomFrame();
 }
 
