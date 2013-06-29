@@ -1,12 +1,16 @@
 _ = require("./underscore.js")
 
+var pixelWidth = 16
+var pixelHeight = 16
+var pixelWidthMinus1 = pixelWidth - 1
+
 
 var movedValue = function (elapsed, dx, x, rate) {
   return (rate * elapsed * dx) + x
 }
 
 var maxed = function (x) {
-  return x < 0 ? 0 : x > 7 ? 7 : x
+  return x < 0 ? 0 : x >= pixelWidth ? pixelWidthMinus1 : x
 }
 
 var moveGoing = function (elapsed, goingX, x, rate) {
@@ -46,13 +50,13 @@ var addFlames = function (state, bomb) {
   for (var i = bombX - 1; i >= 0; i--) {
     addFlame(state, i, bombY)
   }   
-  for (var i = bombX + 1; i < 8; i++) {
+  for (var i = bombX + 1; i < pixelWidth; i++) {
     addFlame(state, i, bombY)
   }   
   for (var i = bombY - 1; i >= 0; i--) {
     addFlame(state, bombX, i)
   }   
-  for (var i = bombY + 1; i < 8; i++) {
+  for (var i = bombY + 1; i < pixelHeight; i++) {
     addFlame(state, bombX, i)
   }   
 }

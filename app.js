@@ -1,5 +1,10 @@
+// todo: event stream vs event state
 _ = require("./underscore.js")
 var io = require('socket.io').listen(8012, {log: false});
+
+var pixelWidth = 16
+var pixelHeight = 16
+var pixelArea = pixelWidth * pixelHeight
 
 var bman = require("./bman.js")
 
@@ -65,7 +70,7 @@ var randomColor = function () {
 var randomFrame = function () {
   var str = ""
   var color = randomColor()
-  for (var i = 0; i < 64; i++) {
+  for (var i = 0; i < pixelArea; i++) {
     //str += randomColor();
     str += color;
   }
@@ -75,19 +80,19 @@ var randomFrame = function () {
 var lastFrame = ""
 var renderFrame = function (state) { 
   var ret = [];
-  for (var i = 0; i < 64; i ++) {
+  for (var i = 0; i < pixelArea; i ++) {
     ret[i] = "00aa00"
   }
   _.each(state.players, function (player) {
-    ret[player.roundY * 8 + player.roundX] = player.color
+    ret[player.roundY * pixelHeight + player.roundX] = player.color
   })
 
   _.each(state.bombs, function (bomb) {
-    ret[(bomb.y) * 8 + (bomb.x)] = "404040"
+    ret[(bomb.y) * pixelHeight + (bomb.x)] = "404040"
   })
 
   _.each(state.flames, function (flame) {
-    ret[(flame.y) * 8 + (flame.x)] = "ff7F00"
+    ret[(flame.y) * pixelHeight + (flame.x)] = "ff7F00"
   })
 
   return ret.join("")

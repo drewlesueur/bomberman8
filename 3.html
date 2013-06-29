@@ -10,7 +10,7 @@
 </style>
 </head>
 <body>
-<canvas style="image-rendering: optimize-contrast; image-rendering: -webkit-optimize-contrast; width:320px; height:320px;" id="c" width="8" height="8"></canvas>
+<canvas style="image-rendering: optimize-contrast; image-rendering: -webkit-optimize-contrast; width:320px; height:320px;" id="c" width="16" height="16"></canvas>
 <br />
 --<br />
 --<br />
@@ -38,19 +38,27 @@ setTimeout(function () {
   scrollTo(0, 0)
 }, 200)
 var canvasEl = document.getElementById("c")
+var viewWidth = 320
+var viewHeight = 320
+var pixelWidth = 16
+var pixelHeight = 16
+var scaledPixelWidth = viewWidth / pixelWidth
+var scaledPixelHeight = viewHeight / pixelHeight
+canvasEl.width = pixelWidth
+canvasEl.height = pixelHeight
+canvasEl.style.width = viewWidth + "px"
+canvasEl.style.height = viewHeight + "px"
 var c = canvasEl.getContext("2d")
-c.fillRect(0,0,320,320)
-var pixelWidth = 320 / 8
-var pixelHeight = 320 / 8
-var imageData = c.createImageData(8, 8)
+c.fillRect(0,0,viewWidth,viewHeight)
+var imageData = c.createImageData(pixelWidth, pixelHeight)
 var render = function (frame) {
-  for (var y = 0; y < 8; y++) {
-    for (var x = 0; x < 8; x++) {
-      var color = frame.substr(((y * 8) + x) * 6, 6) 
+  for (var y = 0; y < pixelHeight; y++) {
+    for (var x = 0; x < pixelWidth; x++) {
+      var color = frame.substr(((y * pixelHeight) + x) * 6, 6) 
       var r = parseInt(color.substr(0, 2), 16)
       var g = parseInt(color.substr(2, 2), 16)
       var b = parseInt(color.substr(4, 2), 16)
-      index = (x + y * 8) * 4
+      index = (x + y * pixelHeight) * 4
       imageData.data[index] = r
       imageData.data[index + 1] = g
       imageData.data[index + 2] = b
@@ -232,8 +240,8 @@ var otherway = function () {
 var thirdway = function () {
   var onTouch = function (e) {
     e.preventDefault()
-    var pointX = Math.floor(e.touches[0].pageX / pixelWidth)
-    var pointY = Math.floor((e.touches[0].pageY) / (pixelHeight) )
+    var pointX = Math.floor(e.touches[0].pageX / scaledPixelWidth)
+    var pointY = Math.floor((e.touches[0].pageY) / (scaledPixelHeight) )
     socket.emit("gotoPoint", [pointX, pointY - 2])
   }
 
@@ -363,8 +371,8 @@ var fifthway = function () {
 var sixthway = function () {
   var onTouch = function (e) {
     e.preventDefault()
-    var pointX = Math.floor((e.touches[0].pageX - 10) / (pixelWidth / 4))
-    var pointY = Math.floor((e.touches[0].pageY - (160 + 80 ) + 10) / (pixelHeight /4))
+    var pointX = Math.floor((e.touches[0].pageX - 10) / (scaledPixelWidth / 4))
+    var pointY = Math.floor((e.touches[0].pageY - (160 + 80 ) + 10) / (scaledPixelHeight /4))
     socket.emit("gotoPoint", [pointX, pointY])
   }
 
