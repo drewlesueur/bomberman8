@@ -1,6 +1,7 @@
 _ = require("./underscore.js")
 
 var dimension = 320
+var gridDimension = 16
 var pixelWidth = dimension
 var pixelHeight = dimension
 var pixelWidthMinus1 = pixelWidth - 1
@@ -33,8 +34,8 @@ var addFlame = function(state, x, y) {
     if (flameKey in bombs) {
       detinateBomb(state, bombs[flameKey], flameKey)
     }
-    if (flameKey in state.playerPos) {
-      _.each(state.playerPos[flameKey], function (player){
+    if (flameKey in state.playersPos) {
+      _.each(state.playersPos[flameKey], function (player){
         player.color = "777"
         player.bombs = -1
       })
@@ -71,10 +72,15 @@ var detinateBomb = function (state, bomb, key) {
   addFlames(state, bomb)
 }
 
-var setPlayerPos = function (state, player, x, y) {
-  var key = x + "_" + y
-  
-} 
+var setplayersPos = function (state, player, gridX, gridY) {
+  var key = gridX + "_" + gridY
+  if (key in state.playersPos) {
+    state.playersPos[key].push(player)
+  } else {
+    state.playersPos[key] = [player]
+  }
+}
+
 var colors = ["fff", "00f", "f00", "ff0", "f0f", "0ff"]
 
 var generateChange = function (item) {
@@ -85,6 +91,11 @@ var generateChange = function (item) {
     item.img
 }
 
+var getGridValue = function (x, w, originX, gridDimension) {
+  var midX = x + originX
+  return Math.floor(midX / gridDimension)
+}
+
 var bman = {};
 bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
@@ -92,6 +103,9 @@ bman.onTime = function (state, timeEvent) {
       if (player.dx != 0 || player.dy != 0) {
         player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
         player.y = maxed(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
+        player.gridX = getGridValue(player.x, player.w, player.originX, gridDimension)
+        player.gridY = getGridValue(player.y, player.h, player.originY, gridDimension)
+        setplayersPos(state, player, player.gridX, player.gridY)
 
         // it might be already maxed out but oh well
         state.hasChanges = true
@@ -101,7 +115,6 @@ bman.onTime = function (state, timeEvent) {
 
       var going = player.going
       if (going) {
-        // todo. just set dx and dy earler and here just determine when to stop
         var goingX = going[0]
         var goingY = going[1]
         if (player.dx == -1 && player.x < goingX) {
@@ -119,30 +132,15 @@ bman.onTime = function (state, timeEvent) {
           player.dy = 0 
           player.y = goingY
         }
+        // TODO: hthis might not have changed, you could prob optimize this
+        player.gridX = getGridValue(player.x, player.w, player.originX, gridDimension)
+        player.gridY = getGridValue(player.y, player.h, player.originY, gridDimension)
+        setplayersPos(state, player, player.gridX, player.gridY)
 
         state.hasChanges = true
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
   }) 
-
-
-          /*
-      var going = playerEvent.going
-      if (going) {
-        var goingX = going[0]
-        var goingY = going[1]
-        player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
-        player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
-      }
-      var roundX = Math.round(player.x)
-      var roundY = Math.round(player.y)
-      player.roundX = roundX
-      player.roundY = roundY
-      player.key = roundX + "_" + roundY
-      
-      setPlayerPos(state, player, roundX, roundY)
-      */
-   
 } 
 
 bman.playerMoveX = function (state, id, direction) {
@@ -198,7 +196,8 @@ bman.onConnect = function (state, id) {
   state.players[id] = {
     x: 0,
     y: 0,
-    color: "f00",
+    originX: 10,
+    originY: 10,
     img: "b",
     moveRate: 1,
     dx: 0,
@@ -242,7 +241,7 @@ var bmanOld = function (state, event) {
       player.roundY = roundY
       player.key = roundX + "_" + roundY
       
-      setPlayerPos(state, player, roundX, roundY)
+      setplayersPos(state, player, roundX, roundY)
       
 
       if (playerEvent.a) {
@@ -282,13 +281,13 @@ var bmanOld = function (state, event) {
     }
   })
 
-  state.playerPos = {}
+  state.playersPos = {}
   _.each(state.players, function (player, key) {
-    if (player.key in state.playerPos) {
-      state.playerPos[player.key].push(player)
+    if (player.key in state.playersPos) {
+      state.playersPos[player.key].push(player)
     } else {
 
-    state.playerPos[player.key] = [player]
+    state.playersPos[player.key] = [player]
     }
   })
 
