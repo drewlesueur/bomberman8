@@ -71,6 +71,8 @@ var addFlames = function (state, bomb) {
 var detinateBomb = function (state, bomb, key) {
   state.bombs[key].player.bombs += 1
   delete state.bombs[key]
+  state.hasChanges = true;
+  state.changesInWhereThingsAre[bomb.id] = null
   addFlames(state, bomb)
 }
 
@@ -145,9 +147,28 @@ bman.onTime = function (state, timeEvent) {
         // todo: maybe have a global where things are
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
-
-        
   }) 
+
+  _.each(state.bombs, function (bomb, key) {
+    bomb.fuse -= elapsed 
+    if (bomb.fuse <= 0) {
+      console.log("boom")
+      detinateBomb(state, bomb, key)
+    }
+  })
+
+
+  var flamesToDelete = []
+  _.each(state.flames, function (flame, key) {
+    flame.duration -= elapsed 
+    if (flame.duration <= 0) {
+      flamesToDelete.push(key)
+    }
+  })
+
+  _.each(flamesToDelete, function (key) {
+    delete state.flames[key]
+  })
 } 
 
 bman.playerMoveX = function (state, id, direction) {
@@ -265,95 +286,6 @@ var bmanOld = function (state, event) {
     })
     event.disconnected = []
   }
-  _.each(event.players, function (playerEvent) {
-    if (playerEvent.id in state.players) {
-      var player = state.players[playerEvent.id]
-      player.x = maxed(movedValue(elapsed, playerEvent.dx, player.x, player.moveRate))
-      player.y = maxed(movedValue(elapsed, playerEvent.dy, player.y, player.moveRate))
-
-      var going = playerEvent.going
-      if (going) {
-        var goingX = going[0]
-        var goingY = going[1]
-        player.x = maxed(moveGoing(elapsed, goingX, player.x, player.moveRate))
-        player.y = maxed(moveGoing(elapsed, goingY, player.y, player.moveRate))
-      }
-      var roundX = Math.round(player.x)
-      var roundY = Math.round(player.y)
-      player.roundX = roundX
-      player.roundY = roundY
-      player.key = roundX + "_" + roundY
-      
-      setplayersPos(state, player, roundX, roundY)
-      
-
-      if (playerEvent.a) {
-        if (player.bombs > 0 && (event.time - player.bombTime > 100)) {
-          player.bombTime = event.time
-          var bombKey = roundX + "_" + roundY
-          if (bombKey in state.bombs) {
-
-          } else {
-            player.bombs = player.bombs - 1
-            state.bombs[bombKey] = {
-              x: roundX,
-              y: roundY,
-              start: event.time,
-              fuse: 2000,
-              fuseLength: 3000,
-              color: "444",
-              player: player
-            }
-          }
-        } 
-      }
-    } else {
-      //console.log("here! :( -- " + playerEvent.id)
-      state.players[playerEvent.id] = {
-        x: 0,
-        y: 0,
-        roundX: 0,
-        roundY: 0,
-        key: "0_0",
-        color: colors[_.random(0, colors.length - 1)],
-        moveRate: 1/50,
-        //moveRate: 1/100,
-        bombs: 10,
-        bombTime: 0
-      }
-    }
-  })
-
-  state.playersPos = {}
-  _.each(state.players, function (player, key) {
-    if (player.key in state.playersPos) {
-      state.playersPos[player.key].push(player)
-    } else {
-
-    state.playersPos[player.key] = [player]
-    }
-  })
-
-  _.each(state.bombs, function (bomb, key) {
-    bomb.fuse -= elapsed 
-    if (bomb.fuse <= 0) {
-      detinateBomb(state, bomb, key)
-    }
-  })
-
-
-  var flamesToDelete = []
-  _.each(state.flames, function (flame, key) {
-    flame.duration -= elapsed 
-    if (flame.duration <= 0) {
-      flamesToDelete.push(key)
-    }
-  })
-
-  _.each(flamesToDelete, function (key) {
-    delete state.flames[key]
-  })
-
 
 
   return state;       
