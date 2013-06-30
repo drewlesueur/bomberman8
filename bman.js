@@ -259,7 +259,7 @@ bman.aDown = function (state, id) {
         h: 20,
         originX: 10,
         originY: 10,
-        img: "bomb",
+        img: "b",
         start: state.time,
         fuse: 2000,
         fuseLength: 3000,
@@ -283,23 +283,35 @@ bman.aUp = function (state) {
 bman.onDisconnect = function (state) {
 
 } 
+var playerImages = ["p", "p2", "p3", "p4", "p5", "p6", "p7", "p8"]
+var playerImageIndex = 0
+var nextPlayer = function () {
+  var playerImage = playerImages[playerImageIndex]
+  playerImageIndex += 1
+  if (playerImageIndex >= playerImages.length) {
+    playerImageIndex = 0
+  }
+  return playerImage
+}
 
 bman.onConnect = function (state, id) {
-  state.players[id] = {
+  var player = {
     x: 0,
     y: 0,
-    originX: 10,
-    originY: 10,
-    img: "b",
+    originX: 8,
+    originY: 16,
+    img: nextPlayer(),
     moveRate: 1/5,
     dx: 0,
     dy: 0,
-    w: 20,
-    h: 20,
+    w: 16,
+    h: 24,
     bombs: 10,
     bombTime: 0
   }
-  state.changesInWhereThingsAre[id] = "0_0_20_20_b"
+  state.players[id] = player
+
+  state.changesInWhereThingsAre[id] = generateChange(player)
   state.hasChanges = true
 } 
 

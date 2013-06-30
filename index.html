@@ -37,7 +37,7 @@
 <script src="mousetrap.js"></script>
 <script>
 var bomb = new Image()
-bomb.src = "http://www.veryicon.com/icon/png/Movie%20%26%20TV/Danger%20Mouse/Bomb.png"
+bomb.src = "Bomb.png"
 setTimeout(function () {
   scrollTo(0, 0)
 }, 200)
@@ -60,6 +60,23 @@ setTimeout(function () {
 
 }, 2000)
 
+
+var bomberSprites = new Image();
+bomberSprites.src = "Bomberman-SBM4.gif"
+var imgs = {
+  "b": { img: bomb, x: 0, y: 0, w: 256, h: 256},
+  "p": {img: bomberSprites, x: 12, y: 277, w: 16, h: 24},
+  "p2": {img: bomberSprites, x: 12, y: 305, w: 16, h: 24},
+  "p3": {img: bomberSprites, x: 12, y: 328, w: 16, h: 24},
+  "p4": {img: bomberSprites, x: 76, y: 328, w: 16, h: 24},
+  "p5": {img: bomberSprites, x: 43, y: 328, w: 16, h: 24},
+  "p6": {img: bomberSprites, x: 111, y: 328, w: 16, h: 24},
+  "p7": {img: bomberSprites, x: 146, y: 328, w: 16, h: 24},
+  "p8": {img: bomberSprites, x: 178, y: 328, w: 16, h: 24},
+  "f": {type: "color", color: "f70"}
+}
+
+
 var render = function (whereThingsAre) {
   c.fillStyle = "#0a0"
   c.fillRect(0, 0, viewWidth, viewHeight)
@@ -73,7 +90,14 @@ var render = function (whereThingsAre) {
     var w = info[2]
     var h = info[3]
     var img = info[4]
-    c.fillRect(x, y, w, h)
+    imgInfo = imgs[img];
+    if (imgInfo.type == "color") {
+      c.fillStyle = "#" + imgInfo.color 
+      c.fillRect(x, y, w, h)
+    } else {
+      //c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
+      c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
+    }
   }
 
   /*

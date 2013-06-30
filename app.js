@@ -35,6 +35,7 @@ onTime = bman.onTime
 onDisconnect = bman.onDisconnect
 onConnect = bman.onConnect
 
+
 var events = {}
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s") // TODO? use a numeric id and make it an array?
