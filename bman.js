@@ -38,32 +38,45 @@ var addFlame = function(state, x, y) {
     }
     if (flameKey in state.playersPos) {
       _.each(state.playersPos[flameKey], function (player){
+        console.log(flameKey)
+        console.log("player hit!")
         player.color = "777"
         player.bombs = -1
       })
     }
-    flames[flameKey] = {
-      x: x,
-      y: y,
+    var flameId = _.uniqueId("f")
+    var flame = {
+      id: flameId,
+      x: x * gridUnitWidth,
+      y: y * gridUnitHeight,
+      w: 20,
+      h: 20,
+      img: "f", //f for flame
+      originX: 10, //TODO calculate these
+      originY: 10,
       duration: 300
-    } 
+    }
+    // TODO : maybe make the flame 4 units total. you can set the height and width?
+    flames[flameKey] = flame 
+    state.hasChanges = true
+    state.changesInWhereThingsAre[flameId] = generateChange(flame)
 }
 
 var addFlames = function (state, bomb) {
   flames = state.flames
   bombs = state.bombs
-  var bombX = bomb.x
-  var bombY = bomb.y
+  var bombX = bomb.gridX
+  var bombY = bomb.gridY
   for (var i = bombX - 1; i >= 0; i--) {
     addFlame(state, i, bombY)
   }   
-  for (var i = bombX + 1; i < pixelWidth; i++) {
+  for (var i = bombX + 1; i < gridDimension; i++) {
     addFlame(state, i, bombY)
   }   
   for (var i = bombY - 1; i >= 0; i--) {
     addFlame(state, bombX, i)
   }   
-  for (var i = bombY + 1; i < pixelHeight; i++) {
+  for (var i = bombY + 1; i < gridDimension; i++) {
     addFlame(state, bombX, i)
   }   
 }
@@ -105,13 +118,14 @@ bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
   //state.elapsed = timeEvent.elapsed // you might need this?
   state.time = timeEvent.time
+  state.playersPos = {} // clear out the old playersPositions. you could just keep it around and change the players that move from one spot to another
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
         player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
         player.y = maxed(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
-        setplayersPos(state, player, player.gridX, player.gridY)
+        //setplayersPos(state, player, player.gridX, player.gridY)
 
         // it might be already maxed out but oh well
         state.hasChanges = true
@@ -141,13 +155,17 @@ bman.onTime = function (state, timeEvent) {
         // TODO: hthis might not have changed, you could prob optimize this
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
-        setplayersPos(state, player, player.gridX, player.gridY)
+        //setplayersPos(state, player, player.gridX, player.gridY)
 
         state.hasChanges = true
         // todo: maybe have a global where things are
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
+      // todo you could maybe use a setPlayersPos when the position chagnes, but then you would have to clear out the old ones.
+      // that woudl probably be faster?
+      setplayersPos(state, player, player.gridX, player.gridY)
   }) 
+
 
   _.each(state.bombs, function (bomb, key) {
     bomb.fuse -= elapsed 
@@ -158,17 +176,15 @@ bman.onTime = function (state, timeEvent) {
   })
 
 
-  var flamesToDelete = []
   _.each(state.flames, function (flame, key) {
     flame.duration -= elapsed 
     if (flame.duration <= 0) {
-      flamesToDelete.push(key)
+      delete state.flames[key]
+      state.hasChanges = true;
+      state.changesInWhereThingsAre[flame.id] = null 
     }
   })
 
-  _.each(flamesToDelete, function (key) {
-    delete state.flames[key]
-  })
 } 
 
 bman.playerMoveX = function (state, id, direction) {
