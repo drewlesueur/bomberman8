@@ -29,35 +29,48 @@ var moveGoing = function (elapsed, dx, goingX, x, rate) {
   return newX
 }
 
-var addFlame = function(state, x, y) {
+var addFlame = function(state, bomb, x, y, w, h, img) {
     var flames = state.flames
     var bombs = state.bombs
-    var flameKey = x + "_" + y
-    if (flameKey in bombs) {
-      detinateBomb(state, bombs[flameKey], flameKey)
+    var bombsPos = state.bombsPos
+
+    var yp2 = y + h
+    var xp2 = x + w
+    for (yp = y; yp < yp2; yp++) {
+      for (xp = x; xp < xp2; xp++) {
+        var flamePosKey = xp + "_" + yp
+        if (flamePosKey in bombsPos) {
+          var bomb2 = bombsPos[flamePosKey]
+          if (bomb2 != bomb) {
+            detinateBomb(state, bombsPos[flamePosKey], bomb2.id)
+          }
+        }
+
+        if (flamePosKey in state.playersPos) {
+          _.each(state.playersPos[flamePosKey], function (player){
+            console.log(flamePosKey)
+            console.log("player hit!")
+            player.color = "777"
+           // player.bombs = -1
+          })
+        }
+      }
     }
-    if (flameKey in state.playersPos) {
-      _.each(state.playersPos[flameKey], function (player){
-        console.log(flameKey)
-        console.log("player hit!")
-        player.color = "777"
-        player.bombs = -1
-      })
-    }
+
     var flameId = _.uniqueId("f")
     var flame = {
       id: flameId,
       x: x * gridUnitWidth,
       y: y * gridUnitHeight,
-      w: 20,
-      h: 20,
+      w: w * gridUnitWidth,
+      h: h * gridUnitHeight,
       img: "f", //f for flame
       originX: 10, //TODO calculate these
       originY: 10,
       duration: 300
     }
     // TODO : maybe make the flame 4 units total. you can set the height and width?
-    flames[flameKey] = flame 
+    flames[flameId] = flame 
     state.hasChanges = true
     state.changesInWhereThingsAre[flameId] = generateChange(flame)
 }
@@ -67,23 +80,21 @@ var addFlames = function (state, bomb) {
   bombs = state.bombs
   var bombX = bomb.gridX
   var bombY = bomb.gridY
-  for (var i = bombX - 1; i >= 0; i--) {
-    addFlame(state, i, bombY)
-  }   
-  for (var i = bombX + 1; i < gridDimension; i++) {
-    addFlame(state, i, bombY)
-  }   
-  for (var i = bombY - 1; i >= 0; i--) {
-    addFlame(state, bombX, i)
-  }   
-  for (var i = bombY + 1; i < gridDimension; i++) {
-    addFlame(state, bombX, i)
-  }   
+  var len = bomb.length || 5
+  addFlame(state, bomb, bombX + 1, bombY, len,  1)
+  addFlame(state, bomb, bombX - len, bombY, len, 1)
+  addFlame(state, bomb, bombX, bombY + 1, 1, len)
+  addFlame(state, bomb, bombX, bombY - len, 1, len)
 }
 
-var detinateBomb = function (state, bomb, key) {
-  state.bombs[key].player.bombs += 1
-  delete state.bombs[key]
+// note there can be only 1 bomb in one spot
+// unlike players that can share a spot
+//
+var detinateBomb = function (state, bomb, bombId) {
+  bomb.player.bombs += 1
+  delete state.bombs[bombId]
+  delete state.bombsPos[bomb.gridX + "_" + bomb.gridY]
+  console.log( _.keys(state.bombs))
   state.hasChanges = true;
   state.changesInWhereThingsAre[bomb.id] = null
   addFlames(state, bomb)
@@ -167,11 +178,13 @@ bman.onTime = function (state, timeEvent) {
   }) 
 
 
-  _.each(state.bombs, function (bomb, key) {
+  var bombsPos = state.bombsPos
+  var bombs = state.bombs
+  _.each(bombs, function (bomb, bombId) {
     bomb.fuse -= elapsed 
     if (bomb.fuse <= 0) {
-      console.log("boom")
-      detinateBomb(state, bomb, key)
+      console.log("boom " + bomb.id)
+      detinateBomb(state, bomb, bombId)
     }
   })
 
@@ -254,9 +267,10 @@ bman.aDown = function (state, id) {
         player: player
       }
 
-      state.bombs[bombKey] = bomb
+      state.bombs[bombId] = bomb
       state.hasChanges = true
       state.changesInWhereThingsAre[bombId] = generateChange(bomb)
+      state.bombsPos[bomb.gridX + "_" + bomb.gridY] =  bomb
     }
   } 
 } 
@@ -277,7 +291,7 @@ bman.onConnect = function (state, id) {
     originX: 10,
     originY: 10,
     img: "b",
-    moveRate: 1,
+    moveRate: 1/5,
     dx: 0,
     dy: 0,
     w: 20,

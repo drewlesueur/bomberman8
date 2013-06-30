@@ -19,8 +19,9 @@ var state = {
   players: {},
   bombs: {},
   flames: {},
-  objects: {},
   playersPos: {},
+  bombsPos: {},
+  flamesPos: {},
   changesInWhereThingsAre: {}
 }
 
