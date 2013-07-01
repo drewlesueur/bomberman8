@@ -1,7 +1,8 @@
 // todo: since you are only sending changes, for new connections,
 // send the whole state
 _ = require("./underscore.js")
-var io = require('socket.io').listen(8013, {log: false});
+//hi bman4
+var io = require('socket.io').listen(8014, {log: false});
 
 var dimension = 16
 var pixelWidth = dimension
@@ -35,11 +36,14 @@ onTime = bman.onTime
 onDisconnect = bman.onDisconnect
 onConnect = bman.onConnect
 
+onTouchStart = bman.onTouchStart
+onTouchEnd = bman.onTouchEnd
+onTouchMove = bman.onTouchMove
+
 
 var events = {}
 io.sockets.on('connection', function (socket) {
   var id = _.uniqueId("s") // TODO? use a numeric id and make it an array?
-
   onConnect(state, id)
 
   socket.on('leftdown', function () {
@@ -70,9 +74,23 @@ io.sockets.on('connection', function (socket) {
     playerMoveY(state, id, 0)
   });
 
+  socket.on("touchstart", function (points) {
+    console.log("yo man")
+    onTouchStart(state, id, points)
+  })
+
+  socket.on("touchmove", function (points) {
+    onTouchMove(state, id, points)
+  })
+
+  socket.on("touchend", function () {
+    onTouchEnd(state, id)
+  })
+
   socket.on("gotoPoint", function (point) {
     playerGoto(state, id, point)
   })
+
   socket.on("stopGoing", function (point) {
     playerStop(state, id, point)
   })

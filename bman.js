@@ -48,9 +48,11 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
 
         if (flamePosKey in state.playersPos) {
           _.each(state.playersPos[flamePosKey], function (player){
-            console.log(flamePosKey)
-            console.log("player hit!")
-            player.color = "777"
+            player.img = "d"
+            player.deadTime = 0
+            player.dead = true
+            state.hasChanges = true
+            state.changesInWhereThingsAre[player.id] = generateChange(player)
            // player.bombs = -1
           })
         }
@@ -94,7 +96,6 @@ var detinateBomb = function (state, bomb, bombId) {
   bomb.player.bombs += 1
   delete state.bombs[bombId]
   delete state.bombsPos[bomb.gridX + "_" + bomb.gridY]
-  console.log( _.keys(state.bombs))
   state.hasChanges = true;
   state.changesInWhereThingsAre[bomb.id] = null
   addFlames(state, bomb)
@@ -172,6 +173,16 @@ bman.onTime = function (state, timeEvent) {
         // todo: maybe have a global where things are
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
+
+      if (player.dead) {
+        player.deadTime += elapsed
+        if (player.deadTime >= 2000) {
+          player.dead = false
+          player.img = player.originalImg
+          state.hasChanges = true
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
+        }
+      }
       // todo you could maybe use a setPlayersPos when the position chagnes, but then you would have to clear out the old ones.
       // that woudl probably be faster?
       setplayersPos(state, player, player.gridX, player.gridY)
@@ -183,7 +194,6 @@ bman.onTime = function (state, timeEvent) {
   _.each(bombs, function (bomb, bombId) {
     bomb.fuse -= elapsed 
     if (bomb.fuse <= 0) {
-      console.log("boom " + bomb.id)
       detinateBomb(state, bomb, bombId)
     }
   })
@@ -228,6 +238,46 @@ bman.playerGoto = function (state, id, point) {
   } else {
     player.dy = 0
   }
+} 
+
+bman.onTouchStart = function (state, id, points) {
+  var player = state.players[id]
+  player.touchStartX = points[0]
+  player.touchStatY = points[1]
+  player.playerStartX = player.x
+  player.playerStartY = player.y
+  player.touchdown = true;
+} 
+
+bman.onTouchMove = function (state, id, points) {
+  var player = state.players[id]
+  var x = points[0]
+  var y = points[1]
+  player.x = player.playerStartX(x - player.touchStartX)
+  player.y =
+  player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+  player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+
+  state.hasChanges = true
+  state.changesInWhereThingsAre[player.id] = generateChange(player)
+}
+
+bman.onTouchEnd = function (state, id) {
+
+}
+
+bman.moveDiff = function (state, id, point) {
+ // was here
+        var x = point[0]
+        var y = point[1]
+        var player = state.players[id]
+        player.x = maxed(player.w, player.x + x)
+        player.y = maxed(player.h, player.y + y)
+        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+
+        state.hasChanges = true
+        state.changesInWhereThingsAre[player.id] = generateChange(player)
 } 
 
 bman.playerStop = function (state, id, point) {
@@ -280,9 +330,12 @@ bman.aUp = function (state) {
 } 
 
 
-bman.onDisconnect = function (state) {
-
+bman.onDisconnect = function (state, id) {
+  delete state.players[id]
+  state.hasChanges = true;
+  state.changesInWhereThingsAre[id] = null
 } 
+
 var playerImages = ["p", "p2", "p3", "p4", "p5", "p6", "p7", "p8"]
 var playerImageIndex = 0
 var nextPlayer = function () {
@@ -295,19 +348,22 @@ var nextPlayer = function () {
 }
 
 bman.onConnect = function (state, id) {
+  var img = nextPlayer()
   var player = {
     x: 0,
     y: 0,
     originX: 8,
     originY: 16,
-    img: nextPlayer(),
+    img: img,
+    originalImg: img,
     moveRate: 1/5,
     dx: 0,
     dy: 0,
     w: 16,
     h: 24,
-    bombs: 10,
-    bombTime: 0
+    bombs: 3,
+    bombTime: 0,
+    id: id
   }
   state.players[id] = player
 
