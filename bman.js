@@ -243,9 +243,11 @@ bman.playerGoto = function (state, id, point) {
 bman.onTouchStart = function (state, id, points) {
   var player = state.players[id]
   player.touchStartX = points[0]
-  player.touchStatY = points[1]
+  player.touchStartY = points[1]
   player.playerStartX = player.x
   player.playerStartY = player.y
+  player.lastMovedX = points[0]
+  player.lastMovedY = points[1]
   player.touchdown = true;
 } 
 
@@ -253,8 +255,11 @@ bman.onTouchMove = function (state, id, points) {
   var player = state.players[id]
   var x = points[0]
   var y = points[1]
-  player.x = player.playerStartX(x - player.touchStartX)
-  player.y =
+  player.lastMovedX = x
+  player.lastMovedY = y
+  return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX), player.playerStartY + (y - player.touchStartY)])
+  player.x = maxed(player.w, player.playerStartX + (x - player.touchStartX))
+  player.y = maxed(player.h, player.playerStartY + (y - player.touchStartY))
   player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
   player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
@@ -263,7 +268,11 @@ bman.onTouchMove = function (state, id, points) {
 }
 
 bman.onTouchEnd = function (state, id) {
-
+  var player = state.players[id]
+  console.log(Math.abs(player.lastMovedX - player.playerStartX), Math.abs(player.lastMovedY - player.playerStartY))
+  if (Math.abs(player.lastMovedX - player.touchStartX) <= 5 && Math.abs(player.lastMovedY - player.touchStartY) <= 5)  {
+    bman.aDown(state, id)
+  }
 }
 
 bman.moveDiff = function (state, id, point) {

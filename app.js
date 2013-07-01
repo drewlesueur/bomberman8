@@ -75,7 +75,6 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on("touchstart", function (points) {
-    console.log("yo man")
     onTouchStart(state, id, points)
   })
 
@@ -84,6 +83,7 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on("touchend", function () {
+    console.log("end!")
     onTouchEnd(state, id)
   })
 
@@ -119,7 +119,7 @@ var tick = function (state, timeEvent) {
   state.changesInWhereThingsAre = {}
   setTimeout(function() {
     tick(state, timeEvent)
-  }, 32) 
+  }, 16) 
 }
 
 
