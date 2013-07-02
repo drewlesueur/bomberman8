@@ -119,7 +119,7 @@ var tick = function (state, timeEvent) {
   state.changesInWhereThingsAre = {}
   setTimeout(function() {
     tick(state, timeEvent)
-  }, 16) 
+  }, 32) 
 }
 
 
