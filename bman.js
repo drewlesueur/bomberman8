@@ -18,6 +18,11 @@ var maxed = function (w, x) {
   return x < 0 ? 0 : x > maxX ? maxX : x
 }
 
+var maxedY = function (w, x) {
+  var maxX = pixelWidth - w - 100 // todo fix this hack!
+  return x < 0 ? 0 : x > maxX ? maxX : x
+}
+
 var moveGoing = function (elapsed, dx, goingX, x, rate) {
   newX =  x + (elapsed * rate * dx)
 
@@ -134,7 +139,7 @@ bman.onTime = function (state, timeEvent) {
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
         player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
-        player.y = maxed(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
+        player.y = maxedY(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         //setplayersPos(state, player, player.gridX, player.gridY)
@@ -240,40 +245,86 @@ bman.playerGoto = function (state, id, point) {
   }
 } 
 
-bman.onTouchStart = function (state, id, points) {
-  var player = state.players[id]
-  player.touchStartX = points[0]
-  player.touchStartY = points[1]
-  player.playerStartX = player.x
-  player.playerStartY = player.y
-  player.lastMovedX = points[0]
-  player.lastMovedY = points[1]
-  player.touchdown = true;
-} 
+var touchPadWay = function () {
+  bman.onTouchStart = function (state, id, points) {
+    var player = state.players[id]
+    player.touchStartX = points[0]
+    player.touchStartY = points[1]
+    player.playerStartX = player.x
+    player.playerStartY = player.y
+    player.lastMovedX = points[0]
+    player.lastMovedY = points[1]
+    player.touchdown = true;
+  } 
 
-bman.onTouchMove = function (state, id, points) {
-  var player = state.players[id]
-  var x = points[0]
-  var y = points[1]
-  player.lastMovedX = x
-  player.lastMovedY = y
-  return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX), player.playerStartY + (y - player.touchStartY)])
-  player.x = maxed(player.w, player.playerStartX + (x - player.touchStartX))
-  player.y = maxed(player.h, player.playerStartY + (y - player.touchStartY))
-  player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
-  player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+  bman.onTouchMove = function (state, id, points) {
+    var player = state.players[id]
+    var x = points[0]
+    var y = points[1]
+    player.lastMovedX = x
+    player.lastMovedY = y
+    return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX), player.playerStartY + (y - player.touchStartY)])
+    player.x = maxed(player.w, player.playerStartX + (x - player.touchStartX))
+    player.y = maxedY(player.h, player.playerStartY + (y - player.touchStartY))
+    player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+    player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
-  state.hasChanges = true
-  state.changesInWhereThingsAre[player.id] = generateChange(player)
-}
+    state.hasChanges = true
+    state.changesInWhereThingsAre[player.id] = generateChange(player)
+  }
 
-bman.onTouchEnd = function (state, id) {
-  var player = state.players[id]
-  console.log(Math.abs(player.lastMovedX - player.playerStartX), Math.abs(player.lastMovedY - player.playerStartY))
-  if (Math.abs(player.lastMovedX - player.touchStartX) <= 5 && Math.abs(player.lastMovedY - player.touchStartY) <= 5)  {
-    bman.aDown(state, id)
+  bman.onTouchEnd = function (state, id) {
+    var player = state.players[id]
+    if (Math.abs(player.lastMovedX - player.touchStartX) <= 5 && Math.abs(player.lastMovedY - player.touchStartY) <= 5)  {
+      bman.aDown(state, id)
+    }
   }
 }
+
+var dpadWay = function () {
+  var dpadCenterX = 50
+  var dpadCenterY = 320 - 50
+
+  var inDPadBounds = function (x, y) {
+    return x < (320 / 2)
+  }
+
+  var dpadValue = function (x, centerX, dx) {
+    var diffX = x - centerX  
+    return diffX < -25 ? -1 : diffX > 25 ? 1 : 0
+  }
+
+  var onTouchAny = function(state, id, points) {
+    var x = points[0]
+    var y = points[1]
+    var player = state.players[id]
+    if (points.length > 2) {
+      bman.aDown(state, id)
+    }
+    if (inDPadBounds(x, y)) {
+      player.dx = dpadValue(x, dpadCenterX, player.dx)
+      player.dy = dpadValue(y, dpadCenterY, player.dy)
+    } else {
+      bman.aDown(state, id)
+    }
+  } 
+  
+  bman.onTouchStart = onTouchAny 
+  bman.onTouchMove = onTouchAny
+
+  bman.onTouchEnd = function (state, id, points) {
+    var x = points[0]
+    var y = points[1]
+    var player = state.players[id]
+    if (inDPadBounds(x, y)) {
+      player.dx = 0
+      player.dy = 0
+    }
+  }
+}
+
+touchPadWay()
+//dpadWay()
 
 bman.moveDiff = function (state, id, point) {
  // was here
@@ -281,7 +332,7 @@ bman.moveDiff = function (state, id, point) {
         var y = point[1]
         var player = state.players[id]
         player.x = maxed(player.w, player.x + x)
-        player.y = maxed(player.h, player.y + y)
+        player.y = maxedY(player.h, player.y + y)
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
@@ -323,7 +374,8 @@ bman.aDown = function (state, id) {
         fuse: 2000,
         fuseLength: 3000,
         color: "444",
-        player: player
+        player: player,
+        length: 15
       }
 
       state.bombs[bombId] = bomb
@@ -358,9 +410,10 @@ var nextPlayer = function () {
 
 bman.onConnect = function (state, id) {
   var img = nextPlayer()
+    // 0_0
   var player = {
-    x: 0,
-    y: 0,
+    x: 100,
+    y: 100,
     originX: 8,
     originY: 16,
     img: img,
@@ -370,7 +423,7 @@ bman.onConnect = function (state, id) {
     dy: 0,
     w: 16,
     h: 24,
-    bombs: 3,
+    bombs: 10,
     bombTime: 0,
     id: id
   }

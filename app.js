@@ -82,9 +82,8 @@ io.sockets.on('connection', function (socket) {
     onTouchMove(state, id, points)
   })
 
-  socket.on("touchend", function () {
-    console.log("end!")
-    onTouchEnd(state, id)
+  socket.on("touchend", function (points) {
+    onTouchEnd(state, id, points)
   })
 
   socket.on("gotoPoint", function (point) {
