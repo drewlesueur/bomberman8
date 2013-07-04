@@ -283,7 +283,10 @@ var touchPadWay = function () {
     player.playerStartY = player.y
     player.lastMovedX = points[0]
     player.lastMovedY = points[1]
-    player.touchdown = true;
+    player.touchStarts += 1;
+    if (player.touchStarts > 1) {
+      bman.aDown(state, id)
+    }
   } 
 
   bman.onTouchMove = function (state, id, points) {
@@ -302,10 +305,12 @@ var touchPadWay = function () {
 
     state.hasChanges = true
     state.changesInWhereThingsAre[player.id] = generateChange(player)
+
   }
 
   bman.onTouchEnd = function (state, id) {
     var player = state.players[id]
+    player.touchStarts -= 1
     if (Math.abs(player.lastMovedX - player.touchStartX) <= 5 && Math.abs(player.lastMovedY - player.touchStartY) <= 5)  {
       bman.aDown(state, id)
     }
@@ -443,6 +448,7 @@ bman.onConnect = function (state, id) {
   var img = nextPlayer()
     // 0_0
   var player = {
+    touchStarts: 0,
     x: 100,
     y: 100,
     originX: 8,
