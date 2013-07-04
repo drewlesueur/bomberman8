@@ -138,8 +138,8 @@ var gridUnitWidth = Math.floor(viewWidth / gridWidth)
 var gridUnitHeight = Math.floor(viewHeight / gridHeight)
 canvasEl.width = viewWidth * 2/2
 canvasEl.height = viewHeight * 2/2
-canvasEl.style.width = viewWidth / 2 + "px"
-canvasEl.style.height = viewHeight / 2 + "px"
+canvasEl.style.width = viewWidth / devicePixelRatio  + "px"
+canvasEl.style.height = viewHeight / devicePixelRatio + "px"
 var c = canvasEl.getContext("2d")
 //c.scale(2,2)
 
