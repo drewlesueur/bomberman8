@@ -1,7 +1,7 @@
 _ = require("./underscore.js")
 
 var dimension = 320
-var gridDimension = 16
+var gridDimension = 8
 var gridUnitWidth = dimension / gridDimension
 var gridUnitHeight = dimension / gridDimension
 var pixelWidth = dimension
@@ -298,18 +298,14 @@ var touchPadWay = function () {
     player.lastMovedY = y
     return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX) + player.w /2 ,
         player.playerStartY + (y - player.touchStartY) + player.h / 2])
-    player.x = maxed(player.w, player.playerStartX + (x - player.touchStartX))
-    player.y = maxedY(player.h, player.playerStartY + (y - player.touchStartY))
-    player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
-    player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
-
-    state.hasChanges = true
-    state.changesInWhereThingsAre[player.id] = generateChange(player)
 
   }
 
   bman.onTouchEnd = function (state, id) {
     var player = state.players[id]
+    player.dx = 0
+    player.dy = 0
+    player.going = false;
     player.touchStarts -= 1
     if (Math.abs(player.lastMovedX - player.touchStartX) <= 5 && Math.abs(player.lastMovedY - player.touchStartY) <= 5)  {
       bman.aDown(state, id)

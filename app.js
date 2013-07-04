@@ -2,9 +2,9 @@
 // send the whole state
 _ = require("./underscore.js")
 //hi bman4
-var io = require('socket.io').listen(8014, {log: false});
+var io = require('socket.io').listen(8015, {log: false});
 
-var dimension = 16
+var dimension = 8
 var pixelWidth = dimension
 var pixelHeight = dimension
 var pixelArea = pixelWidth * pixelHeight
