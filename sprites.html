@@ -10,10 +10,14 @@ sprites = {}
 var canvas = document.createElement("canvas")
 canvas.width = 100
 canvas.height = 100
+canvas.style.imageRendering = "-moz-crisp-edges"
+//http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
+//http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
 var gcanvas = canvas;
 document.body.appendChild(canvas)
 var c = canvas.getContext("2d")
     c.webkitImageSmoothingEnabled = false
+    c.mozImageSmoothingEnabled = false
     c.imageSmoothingEnabled = false
 var gc = c
 
@@ -55,9 +59,11 @@ for (var i = 0; i < spriteData.length; i += 2) {
     canvas.height = height
     canvas.style.width = "320px"
     canvas.style.height = "320px"
-    canvas.style.imageRendering = "-webkit-optimize-contrast"
+    canvas.style.imageRendering = "-webkit-optimize-contrast" //note chrome doesn't support this yet
+    canvas.style.imageRendering = "-moz-crisp-edges" //note chrome doesn't support this yet
     var c = canvas.getContext("2d")
     c.webkitImageSmoothingEnabled = false
+    c.mozImageSmoothingEnabled = false
     c.imageSmoothingEnabled = false
     var imageData = gc.createImageData(width, height)
     _.each(spriteLines, function (spriteLine, y) {

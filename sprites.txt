@@ -5,6 +5,11 @@ x ff0000ff
 w ffffffff
 b 000000ff
 d 770000ff
+n 000000ff
+g 707070ff
+o ff7000ff
+y ffff00ff
+
 
 blank
 
@@ -21,9 +26,142 @@ bomberman
 
 .x......
 ..xxxx..
-..xbwb..
-..xbwb..
+..xnwn..
+..xnwn..
 ..xxxx..
 ..dxx...
 ..dxx...
 ..x.x...
+
+bomberman-arms
+
+.x......
+..xxxx..
+..xnwn..
+..xnwn..
+..xxxx..
+.ddxxd..
+..xxx...
+..x.x...
+
+bomberman-bomb
+
+.x......
+..xxxx..
+..xnwn..
+..xnwn..
+..xxxx..
+..ddn...
+..xnn...
+..x.x...
+
+bomb
+
+........
+..o.....
+...g....
+..nnn...
+.nwnnn..
+.nnnnn..
+.nnnnn..
+..nnn...
+
+flame
+
+....yo..
+....oyo.
+oooooyoo
+yyyyyyyy
+yyyyyyyy
+ooyooooo
+.oyo....
+.yo.....
+
+banana
+
+........
+........
+......y.
+n....yy.
+.yyyyy..
+..yyy...
+........
+........
+
+colors
+
+o 404040ff
+x a0a0a0ff
+
+brick
+
+xxoxxxxx
+xxoxxxxx
+oooooooo
+xxxxxoxx
+xxxxxoxx
+oooooooo
+xxoxxxxx
+xxoxxxxx
+
+colors
+
+x 404040ff
+o a0a0a0ff
+
+brick-hard
+
+xxxxxxxx
+xoooooox
+xoooooox
+xoooooox
+xoooooox
+xoooooox
+xoooooox
+xxxxxxxx
+
+colors
+
+# a0E0a0ff
+. a0D0a0ff
+
+grass
+
+........
+........
+........
+..#.#...
+...#....
+........
+........
+........
+
+colors
+
+. 00000000
+
+prize-bomb
+
+........
+.gggggg.
+.ggnngg.
+.gnnnng.
+.gnnnng.
+.ggnngg.
+.gggggg.
+........
+
+colors
+
+r ff0000ff
+
+prize-kicker
+
+........
+.gggggg.
+.gwwggg.
+.grrggg.
+.grrrrg.
+.grrrrg.
+.gggggg.
+........
