@@ -1,16 +1,12 @@
 _ = require("./underscore.js")
+require("./config.js")
 
-var dimension = 320
-var gridDimension = 8
-var gridUnitWidth = dimension / gridDimension
-var gridUnitHeight = dimension / gridDimension
-var pixelWidth = dimension
-var pixelHeight = dimension
-var pixelWidthMinus1 = pixelWidth - 1
-
-
-
-
+var viewWidth = config.viewWidth
+var viewHeight = config.viewHeight
+var gridWidth = config.gridWidth
+var gridHeight = config.gridHeight
+var gridUnitWidth = viewWidth / gridWidth
+var gridUnitHeight = viewHeight / gridHeight
 
 
 var movedValue = function (elapsed, dx, x, rate) {
@@ -18,12 +14,12 @@ var movedValue = function (elapsed, dx, x, rate) {
 }
 
 var maxed = function (w, x) {
-  var maxX = pixelWidth - w
+  var maxX = viewWidth - w
   return x < 0 ? 0 : x > maxX ? maxX : x
 }
 
 var maxedY = function (w, x) {
-  var maxX = pixelWidth - w //- 100 // todo fix this hack!
+  var maxX = viewHeight - w //- 100 // todo fix this hack!
   return x < 0 ? 0 : x > maxX ? maxX : x
 }
 
@@ -197,31 +193,6 @@ bman.onTime = function (state, timeEvent) {
       setplayersPos(state, player, player.gridX, player.gridY)
   }) 
 
-  if (state.first) {
-      state.first = false
-
-      var player = {
-        x: 100,
-        y: 100,
-        originX: 8,
-        originY: 16,
-        img: "p8",
-        originalImg: "p8",
-        moveRate: 1/2,
-        dx: 0,
-        dy: 0,
-        w: 16,
-        h: 24,
-        bombs: 10,
-        bombTime: 0,
-        id: "badguy"
-      }
-
-      state.players["badguy"] = player
-
-      state.changesInWhereThingsAre["badguy"] = generateChange(player)
-      state.hasChanges = true
-  }
 
   var bombsPos = state.bombsPos
   var bombs = state.bombs
@@ -465,24 +436,6 @@ bman.onConnect = function (state, id) {
   state.changesInWhereThingsAre[id] = generateChange(player)
   state.hasChanges = true
 } 
-
-var bmanOld = function (state, event) {
-  var elapsed = event.elapsed
-  //console.log("players!")
-  //console.log(state.players)
-  //console.log(event.disconnected)
-
-  if (event.disconnected.length) {
-    _.each(event.disconnected, function (id) {
-      delete state.players[id]
-      delete event.players[id] // should I mess with the event?
-    })
-    event.disconnected = []
-  }
-
-
-  return state;       
-}
 
 
 // export

@@ -109,7 +109,7 @@ colors
 x 404040ff
 o a0a0a0ff
 
-brick-hard
+block
 
 xxxxxxxx
 xoooooox

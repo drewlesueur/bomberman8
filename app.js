@@ -4,11 +4,6 @@ _ = require("./underscore.js")
 //hi bman4
 var io = require('socket.io').listen(8015, {log: false});
 
-var dimension = 8
-var pixelWidth = dimension
-var pixelHeight = dimension
-var pixelArea = pixelWidth * pixelHeight
-
 var bman = require("./bman.js")
 
 var event = {
