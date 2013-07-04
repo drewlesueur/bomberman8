@@ -72,8 +72,8 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
       w: w * gridUnitWidth,
       h: h * gridUnitHeight,
       img: "f", //f for flame
-      originX: 10, //TODO calculate these
-      originY: 10,
+      originX: gridUnitWidth / 2,
+      originY: gridUnitHeight / 2,
       duration: 300
     }
     // TODO : maybe make the flame 4 units total. you can set the height and width?
@@ -369,10 +369,10 @@ bman.aDown = function (state, id) {
         y: y * gridUnitHeight,
         gridX: x,
         gridY: y,
-        w: 40,
-        h: 40,
-        originX: 10,
-        originY: 10,
+        w: gridUnitWidth,
+        h: gridUnitHeight,
+        originX: gridUnitWidth / 2,
+        originY: gridUnitHeight / 2,
         img: "b",
         start: state.time,
         fuse: 3000,
@@ -418,15 +418,15 @@ bman.onConnect = function (state, id) {
     touchStarts: 0,
     x: 100,
     y: 100,
-    originX: 8,
-    originY: 16,
+    originX: gridUnitWidth / 2,
+    originY: gridUnitHeight / 2,
     img: img,
     originalImg: img,
     moveRate: 1/1,
     dx: 0,
     dy: 0,
-    w: 32,
-    h: 48,
+    w: gridUnitWidth,
+    h: gridUnitHeight * 1.5,
     bombs: 10,
     bombTime: 0,
     id: id
