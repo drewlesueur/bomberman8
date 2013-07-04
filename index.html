@@ -37,6 +37,7 @@
 <script src="mousetrap.js"></script>
 <script>
 var bomb = new Image()
+//bomb.src = "Banana.png"
 bomb.src = "Bomb.png"
 setTimeout(function () {
   //scrollTo(0, 0)
@@ -64,6 +65,7 @@ setTimeout(function () {
 var bomberSprites = new Image();
 bomberSprites.src = "Bomberman-SBM4.gif"
 var imgs = {
+  //"b": { img: bomb, x: 0, y: 0, w: 512, h: 512},
   "b": { img: bomb, x: 0, y: 0, w: 256, h: 256},
   "p": {img: bomberSprites, x: 11, y: 277, w: 16, h: 24},
   "p2": {img: bomberSprites, x: 11, y: 302, w: 16, h: 24},
@@ -83,7 +85,7 @@ var render = function (whereThingsAre) {
   c.fillStyle = "#0a0"
   c.fillRect(0, 0, viewWidth, viewHeight)
   c.fillStyle = "#000"
-  c.fillRect(50 - 5, 320 - 50 - 5, 10, 10)
+  //c.fillRect(50 - 5, 320 - 50 - 5, 10, 10)
 
   for (key in whereThingsAre) {
     var thing = whereThingsAre[key]

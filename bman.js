@@ -9,6 +9,10 @@ var pixelHeight = dimension
 var pixelWidthMinus1 = pixelWidth - 1
 
 
+
+
+
+
 var movedValue = function (elapsed, dx, x, rate) {
   return (rate * elapsed * dx) + x
 }
@@ -19,7 +23,7 @@ var maxed = function (w, x) {
 }
 
 var maxedY = function (w, x) {
-  var maxX = pixelWidth - w - 100 // todo fix this hack!
+  var maxX = pixelWidth - w //- 100 // todo fix this hack!
   return x < 0 ? 0 : x > maxX ? maxX : x
 }
 
@@ -193,6 +197,31 @@ bman.onTime = function (state, timeEvent) {
       setplayersPos(state, player, player.gridX, player.gridY)
   }) 
 
+  if (state.first) {
+      state.first = false
+
+      var player = {
+        x: 100,
+        y: 100,
+        originX: 8,
+        originY: 16,
+        img: "p8",
+        originalImg: "p8",
+        moveRate: 1/2,
+        dx: 0,
+        dy: 0,
+        w: 16,
+        h: 24,
+        bombs: 10,
+        bombTime: 0,
+        id: "badguy"
+      }
+
+      state.players["badguy"] = player
+
+      state.changesInWhereThingsAre["badguy"] = generateChange(player)
+      state.hasChanges = true
+  }
 
   var bombsPos = state.bombsPos
   var bombs = state.bombs
@@ -365,14 +394,13 @@ bman.aDown = function (state, id) {
         y: y * gridUnitHeight,
         gridX: x,
         gridY: y,
-        w: 20,
-        h: 20,
+        w: 40,
+        h: 40,
         originX: 10,
         originY: 10,
         img: "b",
         start: state.time,
-        fuse: 2000,
-        fuseLength: 3000,
+        fuse: 3000,
         color: "444",
         player: player,
         length: 15
@@ -397,7 +425,7 @@ bman.onDisconnect = function (state, id) {
   state.changesInWhereThingsAre[id] = null
 } 
 
-var playerImages = ["p", "p2", "p3", "p4", "p5", "p6", "p7", "p8"]
+var playerImages = ["p", "p2", "p3", "p4", "p5", "p6", "p7"] //, "p8"]
 var playerImageIndex = 0
 var nextPlayer = function () {
   var playerImage = playerImages[playerImageIndex]
@@ -418,11 +446,11 @@ bman.onConnect = function (state, id) {
     originY: 16,
     img: img,
     originalImg: img,
-    moveRate: 1/5,
+    moveRate: 1/1,
     dx: 0,
     dy: 0,
-    w: 16,
-    h: 24,
+    w: 32,
+    h: 48,
     bombs: 10,
     bombTime: 0,
     id: id
