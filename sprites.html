@@ -4,90 +4,175 @@
 <script src="underscore.js"></script>
 <script>
 var parseSprites = function (text) {
-var spriteData = text.split("\n\n")
-console.log(spriteData)
-sprites = {}
-var canvas = document.createElement("canvas")
-canvas.width = 100
-canvas.height = 100
-canvas.style.imageRendering = "-moz-crisp-edges"
-//http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
-//http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
-var gcanvas = canvas;
-document.body.appendChild(canvas)
-var c = canvas.getContext("2d")
-    c.webkitImageSmoothingEnabled = false
-    c.mozImageSmoothingEnabled = false
-    c.imageSmoothingEnabled = false
-var gc = c
+  var spriteData = text.split("\n\n")
+  console.log(spriteData)
+  sprites = {}
+  var canvas = document.createElement("canvas")
+  canvas.width = 100
+  canvas.height = 100
+  canvas.style.imageRendering = "-moz-crisp-edges"
+  //http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
+  //http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
+  var gcanvas = canvas;
+  document.body.appendChild(canvas)
+  var c = canvas.getContext("2d")
+      c.webkitImageSmoothingEnabled = false
+      c.mozImageSmoothingEnabled = false
+      c.imageSmoothingEnabled = false
+  var gc = c
 
-var redValue = function (hex) {
-  return parseInt(hex.substr(0, 2), 16)
-}
+  var redValue = function (hex) {
+    return parseInt(hex.substr(0, 2), 16)
+  }
 
-var greenValue = function (hex) {
-  return parseInt(hex.substr(2, 2), 16)
-}
+  var greenValue = function (hex) {
+    return parseInt(hex.substr(2, 2), 16)
+  }
 
-var blueValue = function (hex) {
-  return parseInt(hex.substr(4, 2), 16)
-}
+  var blueValue = function (hex) {
+    return parseInt(hex.substr(4, 2), 16)
+  }
 
-var transparentValue = function (hex) {
-  return parseInt(hex.substr(6, 2), 16)
-}
+  var transparentValue = function (hex) {
+    return parseInt(hex.substr(6, 2), 16)
+  }
 
-var colors = {}
-for (var i = 0; i < spriteData.length; i += 2) {
-  var key = spriteData[i]
-  if (key == "colors") {
-    var colorsText = spriteData[i + 1]   
-    var colorLines = colorsText.split("\n")
-    _.each(colorLines, function (colorLine) {
-      var colorLineInfo = colorLine.split(" ")
-      var colorName = colorLineInfo[0]
-      var colorHex = colorLineInfo[1]
-      colors[colorName] = colorHex
-    })
-  } else {
-    var spriteText = spriteData[i + 1]
-    var spriteLines = _.compact(spriteText.split("\n"))
-    var width = spriteLines[0].length
-    var height = spriteLines.length
-    var canvas = document.createElement("canvas")
-    canvas.width = width
-    canvas.height = height
-    canvas.style.width = "320px"
-    canvas.style.height = "320px"
-    canvas.style.imageRendering = "-webkit-optimize-contrast" //note chrome doesn't support this yet
-    canvas.style.imageRendering = "-moz-crisp-edges" //note chrome doesn't support this yet
-    var c = canvas.getContext("2d")
-    c.webkitImageSmoothingEnabled = false
-    c.mozImageSmoothingEnabled = false
-    c.imageSmoothingEnabled = false
-    var imageData = gc.createImageData(width, height)
-    _.each(spriteLines, function (spriteLine, y) {
-      if (spriteLine == "") {
-        return
-      }
-      _.times(width, function (x) {
-        console.log(x)
-        var colorKey = spriteLine.substr(x, 1)
-        var index = ((y * height) + x) * 4
-        var colorString = colors[colorKey]
-        imageData.data[index] = redValue(colorString)
-        imageData.data[index + 1] = greenValue(colorString)
-        imageData.data[index + 2] = blueValue(colorString)
-        imageData.data[index + 3] = transparentValue(colorString)
+  var colors = {}
+  for (var i = 0; i < spriteData.length; i += 2) {
+    var key = spriteData[i]
+    if (key == "colors") {
+      var colorsText = spriteData[i + 1]   
+      var colorLines = colorsText.split("\n")
+      _.each(colorLines, function (colorLine) {
+        var colorLineInfo = colorLine.split(" ")
+        var colorName = colorLineInfo[0]
+        var colorHex = colorLineInfo[1]
+        colors[colorName] = colorHex
       })
-    })
-    c.putImageData(imageData, 0, 0)
-    gc.drawImage(canvas, 0, 0, 100, 100)
+    } else {
+      var spriteText = spriteData[i + 1]
+      var spriteLines = _.compact(spriteText.split("\n"))
+      var width = spriteLines[0].length
+      var height = spriteLines.length
+      var canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      canvas.style.width = "320px"
+      canvas.style.height = "320px"
+      canvas.style.imageRendering = "-webkit-optimize-contrast" //note chrome doesn't support this yet
+      canvas.style.imageRendering = "-moz-crisp-edges" //note chrome doesn't support this yet
+      var c = canvas.getContext("2d")
+      c.webkitImageSmoothingEnabled = false
+      c.mozImageSmoothingEnabled = false
+      c.imageSmoothingEnabled = false
+      var imageData = gc.createImageData(width, height)
+      _.each(spriteLines, function (spriteLine, y) {
+        if (spriteLine == "") {
+          return
+        }
+        _.times(width, function (x) {
+          console.log(x)
+          var colorKey = spriteLine.substr(x, 1)
+          var index = ((y * height) + x) * 4
+          var colorString = colors[colorKey]
+          imageData.data[index] = redValue(colorString)
+          imageData.data[index + 1] = greenValue(colorString)
+          imageData.data[index + 2] = blueValue(colorString)
+          imageData.data[index + 3] = transparentValue(colorString)
+        })
+      })
+      c.putImageData(imageData, 0, 0)
+      gc.drawImage(canvas, 0, 0, 100, 100)
 
-    document.body.appendChild(canvas)
+      document.body.appendChild(canvas)
+    }
   }
 }
 
+var generateCaniForSprites = function (text) {
+  var spriteData = text.split("\n\n")
+  console.log(spriteData)
+  sprites = {}
+  var canvas = document.createElement("canvas")
+  canvas.width = 100
+  canvas.height = 100
+  canvas.style.imageRendering = "-moz-crisp-edges"
+  //http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
+  //http://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
+  var gcanvas = canvas;
+  document.body.appendChild(canvas)
+  var c = canvas.getContext("2d")
+      c.webkitImageSmoothingEnabled = false
+      c.mozImageSmoothingEnabled = false
+      c.imageSmoothingEnabled = false
+  var gc = c
+
+  var redValue = function (hex) {
+    return parseInt(hex.substr(0, 2), 16)
+  }
+
+  var greenValue = function (hex) {
+    return parseInt(hex.substr(2, 2), 16)
+  }
+
+  var blueValue = function (hex) {
+    return parseInt(hex.substr(4, 2), 16)
+  }
+
+  var transparentValue = function (hex) {
+    return parseInt(hex.substr(6, 2), 16)
+  }
+
+  var colors = {}
+  for (var i = 0; i < spriteData.length; i += 2) {
+    var key = spriteData[i]
+    if (key == "colors") {
+      var colorsText = spriteData[i + 1]   
+      var colorLines = colorsText.split("\n")
+      _.each(colorLines, function (colorLine) {
+        var colorLineInfo = colorLine.split(" ")
+        var colorName = colorLineInfo[0]
+        var colorHex = colorLineInfo[1]
+        colors[colorName] = colorHex
+      })
+    } else {
+      var spriteText = spriteData[i + 1]
+      var spriteLines = _.compact(spriteText.split("\n"))
+      var width = spriteLines[0].length
+      var height = spriteLines.length
+      var canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      canvas.style.width = "320px"
+      canvas.style.height = "320px"
+      canvas.style.imageRendering = "-webkit-optimize-contrast" //note chrome doesn't support this yet
+      canvas.style.imageRendering = "-moz-crisp-edges" //note chrome doesn't support this yet
+      var c = canvas.getContext("2d")
+      c.webkitImageSmoothingEnabled = false
+      c.mozImageSmoothingEnabled = false
+      c.imageSmoothingEnabled = false
+      var imageData = gc.createImageData(width, height)
+      _.each(spriteLines, function (spriteLine, y) {
+        if (spriteLine == "") {
+          return
+        }
+        _.times(width, function (x) {
+          console.log(x)
+          var colorKey = spriteLine.substr(x, 1)
+          var index = ((y * height) + x) * 4
+          var colorString = colors[colorKey]
+          imageData.data[index] = redValue(colorString)
+          imageData.data[index + 1] = greenValue(colorString)
+          imageData.data[index + 2] = blueValue(colorString)
+          imageData.data[index + 3] = transparentValue(colorString)
+        })
+      })
+      c.putImageData(imageData, 0, 0)
+      gc.drawImage(canvas, 0, 0, 100, 100)
+
+      document.body.appendChild(canvas)
+    }
+  }
 }
 
 $.get("sprites.txt", function (text) {

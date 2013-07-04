@@ -5,8 +5,8 @@ var viewWidth = config.viewWidth
 var viewHeight = config.viewHeight
 var gridWidth = config.gridWidth
 var gridHeight = config.gridHeight
-var gridUnitWidth = viewWidth / gridWidth
-var gridUnitHeight = viewHeight / gridHeight
+var gridUnitWidth = Math.floor(viewWidth / gridWidth)
+var gridUnitHeight = Math.floor(viewHeight / gridHeight)
 
 
 var movedValue = function (elapsed, dx, x, rate) {
@@ -373,7 +373,7 @@ bman.aDown = function (state, id) {
         h: gridUnitHeight,
         originX: gridUnitWidth / 2,
         originY: gridUnitHeight / 2,
-        img: "b",
+        img: "bomb",
         start: state.time,
         fuse: 3000,
         color: "444",
@@ -412,7 +412,7 @@ var nextPlayer = function () {
 }
 
 bman.onConnect = function (state, id) {
-  var img = nextPlayer()
+  var img = "p2"//nextPlayer()
     // 0_0
   var player = {
     touchStarts: 0,
@@ -422,11 +422,11 @@ bman.onConnect = function (state, id) {
     originY: gridUnitHeight / 2,
     img: img,
     originalImg: img,
-    moveRate: 1/1,
+    moveRate: 2/1,
     dx: 0,
     dy: 0,
     w: gridUnitWidth,
-    h: gridUnitHeight * 1.5,
+    h: gridUnitHeight,
     bombs: 10,
     bombTime: 0,
     id: id

@@ -33,6 +33,17 @@ bomberman
 ..dxx...
 ..x.x...
 
+p2
+
+.x......
+..xxxx..
+..xnwn..
+..xnwn..
+..xxxx..
+..dxx...
+..dxx...
+..x.x...
+
 bomberman-arms
 
 .x......
@@ -67,6 +78,17 @@ bomb
 ..nnn...
 
 flame
+
+..o.yo..
+....oyo.
+oooooyoo
+yyyyyyyy
+yyyyyyyy
+ooyooooo
+.oyo....
+.yo...o.
+
+f
 
 ..o.yo..
 ....oyo.

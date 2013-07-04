@@ -34,9 +34,95 @@
 --<br />
 --<br />
 <script src="socket.io.js"></script>
+<script src="zepto.min.js"></script>
+<script src="underscore.js"></script>
 <script src="mousetrap.js"></script>
 <script src="config.js"></script>
 <script>
+
+var generateCanviForSprites = function (text) {
+  var spriteData = text.split("\n\n")
+  console.log(spriteData)
+  sprites = {}
+
+  var redValue = function (hex) {
+    return parseInt(hex.substr(0, 2), 16)
+  }
+
+  var greenValue = function (hex) {
+    return parseInt(hex.substr(2, 2), 16)
+  }
+
+  var blueValue = function (hex) {
+    return parseInt(hex.substr(4, 2), 16)
+  }
+
+  var transparentValue = function (hex) {
+    return parseInt(hex.substr(6, 2), 16) / 255
+  }
+
+  var colors = {}
+  for (var i = 0; i < spriteData.length; i += 2) {
+    var key = spriteData[i]
+    if (key == "colors") {
+      var colorsText = spriteData[i + 1]   
+      var colorLines = colorsText.split("\n")
+      _.each(colorLines, function (colorLine) {
+        var colorLineInfo = colorLine.split(" ")
+        var colorName = colorLineInfo[0]
+        var colorHex = colorLineInfo[1]
+        colors[colorName] = colorHex
+      })
+    } else {
+      var spriteText = spriteData[i + 1]
+      var spriteLines = _.compact(spriteText.split("\n"))
+      var width = spriteLines[0].length
+      var height = spriteLines.length
+      var canvas = document.createElement("canvas")
+      // was here
+      canvas.width = gridUnitWidth
+      canvas.height = gridUnitHeight
+      var subPixelUnitWidth = gridUnitWidth / width
+      var subPixelUnitHeight = gridUnitHeight / height
+      var c = canvas.getContext("2d")
+      _.each(spriteLines, function (spriteLine, y) {
+        if (spriteLine == "") {
+          return
+        }
+        _.times(width, function (x) {
+          var colorKey = spriteLine.substr(x, 1)
+          var colorString = colors[colorKey]
+          var r = redValue(colorString)
+          var g  = greenValue(colorString)
+          var b  = blueValue(colorString)
+          var a  = transparentValue(colorString)
+
+          c.fillStyle = "rgba("+ r +", " + g + ", " + b + ", " + a + ")"
+          c.fillRect(
+            (x * subPixelUnitWidth),
+            (y * subPixelUnitHeight),
+            (subPixelUnitWidth), 
+            (subPixelUnitHeight)
+          )
+        })
+      })
+      var pattern = c.createPattern(canvas, 'repeat')
+      imgs[key] = {img: canvas, x: 0, y: 0, w: gridUnitWidth, h: gridUnitHeight, pattern: pattern }
+      document.body.appendChild(canvas)
+    }
+  }
+  return imgs
+}
+
+var imgs = {}
+
+$.get("sprites.txt", function (text) {
+  imgs = generateCanviForSprites(text)
+})
+
+
+
+
 var bomb = new Image()
 //bomb.src = "Banana.png"
 bomb.src = "Bomb.png"
@@ -48,14 +134,14 @@ var viewWidth = config.viewWidth
 var viewHeight = config.viewHeight
 var gridWidth = config.gridWidth
 var gridHeight = config.gridHeight
-var gridUnitWidth = viewWidth / gridWidth
-var gridUnitHeight = viewHeight / gridHeight
-canvasEl.width = viewWidth * 2
-canvasEl.height = viewHeight * 2
-canvasEl.style.width = viewWidth + "px"
-canvasEl.style.height = viewHeight + "px"
+var gridUnitWidth = Math.floor(viewWidth / gridWidth)
+var gridUnitHeight = Math.floor(viewHeight / gridHeight)
+canvasEl.width = viewWidth * 2/2
+canvasEl.height = viewHeight * 2/2
+canvasEl.style.width = viewWidth / 2 + "px"
+canvasEl.style.height = viewHeight / 2 + "px"
 var c = canvasEl.getContext("2d")
-c.scale(2,2)
+//c.scale(2,2)
 
 var bomberSprites = new Image();
 bomberSprites.src = "Bomberman-SBM4.gif"
@@ -76,6 +162,7 @@ var imgs = {
 }
 
 
+      //c.translate(0.5, 0.5)
 var render = function (whereThingsAre) {
   c.fillStyle = "#0a0"
   c.fillRect(0, 0, viewWidth, viewHeight)
@@ -97,7 +184,11 @@ var render = function (whereThingsAre) {
       c.fillRect(x, y, w, h)
     } else {
       //c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
-      c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
+      //c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
+      c.translate(x, y)
+      c.fillStyle = imgInfo.pattern
+      c.fillRect(0, 0, w, h)
+      c.translate(-x, -y)
     }
   }
 }
@@ -165,7 +256,7 @@ var rawway = function () {
   document.body.ontouchstart = function (e) {
     e.preventDefault()
     var touch = e.touches[0]
-    point = [touch.pageX, touch.pageY]
+    point = [touch.pageX * 2, touch.pageY * 2]
     socket.emit("touchstart", point)
   }
   
@@ -174,16 +265,16 @@ var rawway = function () {
     var touch = e.touches[0]
     var touch2 = e.touches[1]
     if (touch && touch2) {
-      socket.emit("touchmove", [touch.pageX, touch.pageY, touch2.pageX, touch2.pageY])
+      socket.emit("touchmove", [touch.pageX * 2, touch.pageY * 2, touch2.pageX * 2, touch2.pageY * 2])
     } else {
-      socket.emit("touchmove", [touch.pageX, touch.pageY])
+      socket.emit("touchmove", [touch.pageX * 2, touch.pageY * 2])
     }
   }
 
   document.body.ontouchend = function (e) {
     e.preventDefault();
     var touch = e.changedTouches[0]
-    socket.emit("touchend", [touch.pageX, touch.pageY])
+    socket.emit("touchend", [touch.pageX * 2, touch.pageY * 2])
   }
 }
 
