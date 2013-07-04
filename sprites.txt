@@ -68,14 +68,14 @@ bomb
 
 flame
 
-....yo..
+..o.yo..
 ....oyo.
 oooooyoo
 yyyyyyyy
 yyyyyyyy
 ooyooooo
 .oyo....
-.yo.....
+.yo...o.
 
 banana
 

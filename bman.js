@@ -287,12 +287,14 @@ var touchPadWay = function () {
   } 
 
   bman.onTouchMove = function (state, id, points) {
+    // was here
     var player = state.players[id]
     var x = points[0]
     var y = points[1]
     player.lastMovedX = x
     player.lastMovedY = y
-    return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX), player.playerStartY + (y - player.touchStartY)])
+    return bman.playerGoto(state, id, [player.playerStartX + (x - player.touchStartX) + player.w /2 ,
+        player.playerStartY + (y - player.touchStartY) + player.h / 2])
     player.x = maxed(player.w, player.playerStartX + (x - player.touchStartX))
     player.y = maxedY(player.h, player.playerStartY + (y - player.touchStartY))
     player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
@@ -379,7 +381,8 @@ bman.aDown = function (state, id) {
   var player = state.players[id]
   var x = player.gridX
   var y = player.gridY
-  if (player.bombs > 0 && (state.time - player.bombTime > 100)) {
+  //if (player.bombs > 0 && (state.time - player.bombTime > 100)) {
+  if (player.bombs > 0 ) {
     player.bombTime = state.time
     var bombKey = x + "_" + y
     if (bombKey in state.bombs) {
