@@ -71,7 +71,7 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
       y: y * gridUnitHeight,
       w: w * gridUnitWidth,
       h: h * gridUnitHeight,
-      img: "f", //f for flame
+      img: img,
       originX: gridUnitWidth / 2,
       originY: gridUnitHeight / 2,
       duration: 300
@@ -88,10 +88,10 @@ var addFlames = function (state, bomb) {
   var bombX = bomb.gridX
   var bombY = bomb.gridY
   var len = bomb.length || 5
-  addFlame(state, bomb, bombX + 1, bombY, len,  1)
-  addFlame(state, bomb, bombX - len, bombY, len, 1)
-  addFlame(state, bomb, bombX, bombY + 1, 1, len)
-  addFlame(state, bomb, bombX, bombY - len, 1, len)
+  addFlame(state, bomb, bombX + 1, bombY, len,  1, "fr") //flame right
+  addFlame(state, bomb, bombX - len, bombY, len, 1, "fl") // flame left
+  addFlame(state, bomb, bombX, bombY + 1, 1, len, "fd")
+  addFlame(state, bomb, bombX, bombY - len, 1, len, "fu")
 }
 
 // note there can be only 1 bomb in one spot
