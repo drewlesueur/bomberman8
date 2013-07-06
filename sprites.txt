@@ -81,6 +81,10 @@ bomb
 .nnnnn..
 ..nnn...
 
+rotated-bomb
+
+tweak flipDiag bomb
+
 flame
 
 ..o.yo..
@@ -103,6 +107,14 @@ tweak same flame
 fr
 
 tweak flipy flame
+
+fu
+
+tweak flipDiag flame
+
+fd
+
+tweak flipx fu
 
 banana
 
@@ -182,7 +194,7 @@ colors
 
 r ff0000ff
 
-prize-kicker
+pk
 
 ........
 .gggggg.
@@ -192,3 +204,7 @@ prize-kicker
 .grrrrg.
 .gggggg.
 ........
+
+pk2
+
+tweak flipDiag pk
