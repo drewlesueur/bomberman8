@@ -43,7 +43,6 @@
 var generateCanviForSprites = function (text) {
   var spriteData = text.split("\n\n")
   console.log(spriteData)
-  sprites = {}
 
   var redValue = function (hex) {
     return parseInt(hex.substr(0, 2), 16)
@@ -61,6 +60,58 @@ var generateCanviForSprites = function (text) {
     return parseInt(hex.substr(6, 2), 16) / 255
   }
 
+  var spriteTexts = {}
+
+  var tweaks = {
+    flipy: function (spriteText, colors) {
+      var newSprite = _.map(spriteText.split("\n"), function (spriteLine) {
+        return spriteLine.split("").reverse().join("")
+      }).join("\n")
+      return newSprite
+    },
+    flipx: function (spriteText, colors) {
+      return spriteText.split("\n").reverse().join("") 
+    },
+    same: function (spriteText, colots) {
+      return spriteText
+    } 
+  }
+
+  var createCanvasForSprite = function (spriteText, colors) {
+    var spriteLines = _.compact(spriteText.split("\n"))
+    var width = spriteLines[0].length
+    var height = spriteLines.length
+    var canvas = document.createElement("canvas")
+    // was here
+    canvas.width = gridUnitWidth
+    canvas.height = gridUnitHeight
+    var subPixelUnitWidth = gridUnitWidth / width
+    var subPixelUnitHeight = gridUnitHeight / height
+    var c = canvas.getContext("2d")
+    _.each(spriteLines, function (spriteLine, y) {
+      if (spriteLine == "") {
+        return
+      }
+      _.times(width, function (x) {
+        var colorKey = spriteLine.substr(x, 1)
+        var colorString = colors[colorKey]
+        var r = redValue(colorString)
+        var g  = greenValue(colorString)
+        var b  = blueValue(colorString)
+        var a  = transparentValue(colorString)
+
+        c.fillStyle = "rgba("+ r +", " + g + ", " + b + ", " + a + ")"
+        c.fillRect(
+          (x * subPixelUnitWidth),
+          (y * subPixelUnitHeight),
+          (subPixelUnitWidth), 
+          (subPixelUnitHeight)
+        )
+      })
+    })
+    return canvas
+  } 
+
   var colors = {}
   for (var i = 0; i < spriteData.length; i += 2) {
     var key = spriteData[i]
@@ -75,37 +126,15 @@ var generateCanviForSprites = function (text) {
       })
     } else {
       var spriteText = spriteData[i + 1]
-      var spriteLines = _.compact(spriteText.split("\n"))
-      var width = spriteLines[0].length
-      var height = spriteLines.length
-      var canvas = document.createElement("canvas")
-      // was here
-      canvas.width = gridUnitWidth
-      canvas.height = gridUnitHeight
-      var subPixelUnitWidth = gridUnitWidth / width
-      var subPixelUnitHeight = gridUnitHeight / height
-      var c = canvas.getContext("2d")
-      _.each(spriteLines, function (spriteLine, y) {
-        if (spriteLine == "") {
-          return
-        }
-        _.times(width, function (x) {
-          var colorKey = spriteLine.substr(x, 1)
-          var colorString = colors[colorKey]
-          var r = redValue(colorString)
-          var g  = greenValue(colorString)
-          var b  = blueValue(colorString)
-          var a  = transparentValue(colorString)
 
-          c.fillStyle = "rgba("+ r +", " + g + ", " + b + ", " + a + ")"
-          c.fillRect(
-            (x * subPixelUnitWidth),
-            (y * subPixelUnitHeight),
-            (subPixelUnitWidth), 
-            (subPixelUnitHeight)
-          )
-        })
-      })
+      if (spriteText.substr(0, "tweak".length) == "tweak") {
+        var commandsArray = spriteText.split(" ")
+        var spriteText = tweaks[commandsArray[1]](spriteTexts[commandsArray[2]], colors)
+      }
+      
+      spriteTexts[key] = spriteText  
+      var canvas = createCanvasForSprite(spriteText, colors) 
+
       var pattern = c.createPattern(canvas, 'repeat')
       imgs[key] = {img: canvas, x: 0, y: 0, w: gridUnitWidth, h: gridUnitHeight, pattern: pattern }
       document.body.appendChild(canvas)
