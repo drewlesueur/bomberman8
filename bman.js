@@ -426,7 +426,7 @@ bman.onConnect = function (state, id) {
     dx: 0,
     dy: 0,
     w: gridUnitWidth,
-    h: gridUnitHeight,
+    h: gridUnitHeight * 1.5,
     bombs: 10,
     bombTime: 0,
     id: id

@@ -98,17 +98,19 @@ var generateCanviForSprites = function (text) {
       return spriteText
     } 
   }
+  var dimsX = 1
+  var dimsY = 1
 
-  var createCanvasForSprite = function (spriteText, colors) {
+  var createCanvasForSprite = function (spriteText, colors, dimsX, dimsY) {
     var spriteLines = _.compact(spriteText.split("\n"))
     var width = spriteLines[0].length
     var height = spriteLines.length
     var canvas = document.createElement("canvas")
     // was here
-    canvas.width = gridUnitWidth
-    canvas.height = gridUnitHeight
-    var subPixelUnitWidth = gridUnitWidth / width
-    var subPixelUnitHeight = gridUnitHeight / height
+    canvas.width = gridUnitWidth * dimsX
+    canvas.height = gridUnitHeight * dimsY
+    var subPixelUnitWidth = gridUnitWidth * dimsX / width
+    var subPixelUnitHeight = gridUnitHeight * dimsY/ height
     var c = canvas.getContext("2d")
     _.each(spriteLines, function (spriteLine, y) {
       if (spriteLine == "") {
@@ -146,6 +148,11 @@ var generateCanviForSprites = function (text) {
         var colorHex = colorLineInfo[1]
         colors[colorName] = colorHex
       })
+    } else if (key == "dims") {
+      var dimsText = spriteData[i + 1]   
+      var dimsTextArray = dimsText.split(" ")
+      dimsX = dimsTextArray[0]
+      dimsY = dimsTextArray[1]
     } else {
       var spriteText = spriteData[i + 1].trim()
 
@@ -155,10 +162,10 @@ var generateCanviForSprites = function (text) {
       }
       
       spriteTexts[key] = spriteText  
-      var canvas = createCanvasForSprite(spriteText, colors) 
+      var canvas = createCanvasForSprite(spriteText, colors, dimsX, dimsY) 
 
       var pattern = c.createPattern(canvas, 'repeat')
-      imgs[key] = {img: canvas, x: 0, y: 0, w: gridUnitWidth, h: gridUnitHeight, pattern: pattern }
+      imgs[key] = {img: canvas, x: 0, y: 0, w: gridUnitWidth * dimsX, h: gridUnitHeight * dimsY, pattern: pattern }
       document.body.appendChild(canvas)
       document.body.appendChild(document.createElement("br"))
 
