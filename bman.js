@@ -148,6 +148,9 @@ bman.onTime = function (state, timeEvent) {
         if (player.animationFrame >= 4) {
           player.animationFrame = 0
         }
+        if (player.flashy) {
+          player.baseImage = nextPlayer()
+        }
         player.img = player.baseImage + player.direction + Math.floor(player.animationFrame)
 
         // it might be already maxed out but oh well
@@ -423,7 +426,7 @@ bman.onDisconnect = function (state, id) {
   state.changesInWhereThingsAre[id] = null
 } 
 
-var playerImages = ["pninja"]//["pr", "pb", "po", "px", "pw", "pp", "pg", "pt", "pgold", "pninja"] //, "p8"]
+var playerImages = ["pr", "pb", "po", "px", "pw", "pp", "pg", "pt", "pgold", "pninja"] //, "p8"]
 var playerImageIndex = 0
 var nextPlayer = function () {
   var playerImage = playerImages[playerImageIndex]
@@ -440,6 +443,7 @@ bman.onConnect = function (state, id) {
   var baseImage = nextPlayer()
   var direction = "f"
   var player = {
+    flashy: _.random(0,5) == 0,
     touchStarts: 0,
     baseImage: baseImage,
     direction: direction,

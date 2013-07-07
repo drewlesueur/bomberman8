@@ -98,11 +98,11 @@ ooyooooo
 
 f
 
-tweak same flame
+same flame
 
 fl
 
-tweak same flame
+same flame
 
 fr
 
@@ -519,7 +519,43 @@ prb3
 
 same bomberman_back_right_foot
 
+dims
 
+1 1
 
+colors
 
+@ ffff73ff
+# ffff00ff
+* ffd240ff
 
+fr
+
+................
+................
+................
+*.*......*.*....
+.......**.....**
+*******##*****##
+################
+@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@
+################
+**##*******##***
+..**.......**...
+....*.*......*.*
+................
+................
+................
+
+fl
+
+tweak flipy fr
+
+fd
+
+tweak flipDiag fr
+
+fu
+
+tweak flipx fd
