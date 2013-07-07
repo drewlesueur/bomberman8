@@ -1,44 +1,26 @@
 <!doctype html>
-<html>
-<head>
-  <meta name = "viewport" content = "initial-scale = 1.0, maximum-scale=1, minimum-scale=1">
-<style>
-  * {
-    padding: 0;
-    margin: 0;
-  }
-</style>
-</head>
-<body>
-<div align="center">
-<canvas style="image-rendering: optimize-contrast; image-rendering: -webkit-optimize-contrast; width:320px; height:320px;" id="c" width="16" height="16"></canvas>
-</div>
-<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
---<br />
-<script src="socket.io.js"></script>
 <script src="zepto.min.js"></script>
 <script src="underscore.js"></script>
 <script src="mousetrap.js"></script>
 <script src="config.js"></script>
+
 <script>
+
+var viewWidth = config.viewWidth
+var viewHeight = config.viewHeight
+var gridWidth = config.gridWidth
+var gridHeight = config.gridHeight
+var gridUnitWidth = Math.floor(viewWidth / gridWidth)
+var gridUnitHeight = Math.floor(viewHeight / gridHeight)
+
+
+var canvasEl = document.createElement("canvas")
+canvasEl.width = viewWidth * 2/2
+canvasEl.height = viewHeight * 2/2
+canvasEl.style.width = viewWidth / devicePixelRatio  + "px"
+canvasEl.style.height = viewHeight / devicePixelRatio + "px"
+var c = canvasEl.getContext("2d")
+
 var redValue = function (hex) {
   return parseInt(hex.substr(0, 2), 16)
 }
@@ -92,7 +74,6 @@ var createCanvasForSprite = function (spriteText, colors, dimsX, dimsY) {
 
 var generateCanviForSprites = function (text) {
   var spriteData = _.compact(text.trim().split("\n\n"))
-  console.log(spriteData)
 
 
   var spriteTexts = {}
@@ -248,183 +229,34 @@ $.get("sprites.txt", function (text) {
       var canvas = createCanvasForSprite(spriteTexts[key], _.extend(colors, playerColorScheme), dimsX, dimsY)
       var pattern = c.createPattern(canvas, 'repeat')
       imgs[newKey] = {img: canvas, x: 0, y: 0, w: gridUnitWidth * dimsX, h: gridUnitHeight * dimsY, pattern: pattern }
-        //document.body.appendChild(imgs[newKey].img)
-        //document.body.appendChild(document.createElement("br"))
+      document.body.appendChild(imgs[newKey].img)
+      document.body.appendChild(document.createElement("br"))
     })
   })
+
+
+  console.log(imgs)
+  var maxWidth = _.max(imgs, function (img) { return img.w}).w
+  var totalHeight = _.reduce(imgs, function (memo, img) {
+    return memo + img.h
+  }, 0)  
+
+  canvasEl.width = maxWidth
+  canvasEl.height = totalHeight
+
+  document.body.appendChild(canvasEl)
+  var y = 0
+  _.each(imgs, function (img) {
+    c.drawImage(img.img, 0, y) 
+    y += img.h
+  })
+  console.log(canvasEl)
+  window.open(canvasEl.toDataURL())
+
 })
 
-
-
-
-var bomb = new Image()
-//bomb.src = "Banana.png"
-bomb.src = "Bomb.png"
-setTimeout(function () {
-  //scrollTo(0, 0)
-}, 200)
-var canvasEl = document.getElementById("c")
-var viewWidth = config.viewWidth
-var viewHeight = config.viewHeight
-var gridWidth = config.gridWidth
-var gridHeight = config.gridHeight
-var gridUnitWidth = Math.floor(viewWidth / gridWidth)
-var gridUnitHeight = Math.floor(viewHeight / gridHeight)
-canvasEl.width = viewWidth * 2/2
-canvasEl.height = viewHeight * 2/2
-canvasEl.style.width = viewWidth / devicePixelRatio  + "px"
-canvasEl.style.height = viewHeight / devicePixelRatio + "px"
-var c = canvasEl.getContext("2d")
-//c.scale(2,2)
-
-var bomberSprites = new Image();
-bomberSprites.src = "Bomberman-SBM4.gif"
-var imgs = {
-  //"b": { img: bomb, x: 0, y: 0, w: 512, h: 512},
-  "b": { img: bomb, x: 0, y: 0, w: 256, h: 256},
-  "p": {img: bomberSprites, x: 11, y: 277, w: 16, h: 24},
-  "p2": {img: bomberSprites, x: 11, y: 302, w: 16, h: 24},
-  "p3": {img: bomberSprites, x: 11, y: 328, w: 16, h: 24},
-  "p4": {img: bomberSprites, x: 76, y: 328, w: 16, h: 24},
-  "p5": {img: bomberSprites, x: 43, y: 328, w: 16, h: 24},
-  "p6": {img: bomberSprites, x: 111, y: 328, w: 16, h: 24},
-  "p7": {img: bomberSprites, x: 144, y: 328, w: 16, h: 24},
-  "p8": {img: bomberSprites, x: 178, y: 328, w: 16, h: 24},
-  "f": {type: "color", color: "f00"},
-  //"d": {type: "color", color: "777"}
-  "d": {img: bomberSprites, x: 191, y: 174, w: 218 - 191, h: 202 - 174},
-}
-
-
-      //c.translate(0.5, 0.5)
-var render = function (whereThingsAre) {
-  c.fillStyle = "#0a0"
-  c.fillRect(0, 0, viewWidth, viewHeight)
-  c.fillStyle = "#000"
-  //c.fillRect(50 - 5, 320 - 50 - 5, 10, 10)
-
-  for (key in whereThingsAre) {
-    var thing = whereThingsAre[key]
-    c.fillStyle = "#000000"    
-    var info = thing.split("_")
-    var x = info[0]
-    var y = info[1]
-    var w = info[2]
-    var h = info[3]
-    var img = info[4]
-    imgInfo = imgs[img];
-    if (imgInfo.type == "color") {
-      c.fillStyle = "#" + imgInfo.color 
-      c.fillRect(x, y, w, h)
-    } else {
-      //c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
-      //c.drawImage(imgInfo.img, imgInfo.x, imgInfo.y, imgInfo.w, imgInfo.h, x, y, w, h)
-      c.translate(x, y)
-      c.fillStyle = imgInfo.pattern
-      c.fillRect(0, 0, w, h)
-      c.translate(-x, -y)
-    }
-  }
-}
-
-var socket = io.connect('http://drewles.com:8015');
-var state
-var whereThingsAre = {}
-socket.on("ciwta", function (changes) {
-  console.log(changes)
-  var len = changes.length
-  for (key in changes) { // ordering? of where stuff is aka z-index
-    var change = changes[key]; 
-    if (!change) delete whereThingsAre[key]
-    else whereThingsAre[key] = change
-  }  
-  render(whereThingsAre)
-})
-
-Mousetrap.bind("left", function (e) {
-  e.preventDefault()
-  socket.emit("leftdown")
-}, 'keydown')
-
-Mousetrap.bind("left", function () {
-  socket.emit("leftup")
-}, 'keyup')
-
-Mousetrap.bind("right", function (e) {
-  e.preventDefault()
-  socket.emit("rightdown")
-}, 'keydown')
-
-Mousetrap.bind("right", function () {
-  socket.emit("rightup")
-}, 'keyup')
-
-Mousetrap.bind("up", function (e) {
-  e.preventDefault()
-  socket.emit("updown")
-}, 'keydown')
-
-Mousetrap.bind("up", function () {
-  socket.emit("upup")
-}, 'keyup')
-
-Mousetrap.bind("down", function (e) {
-  e.preventDefault()
-  socket.emit("downdown")
-}, 'keydown')
-
-Mousetrap.bind("down", function () {
-  socket.emit("downup")
-}, 'keyup')
-
-Mousetrap.bind("space", function (e){
-  e.preventDefault()
-  socket.emit("adown")
-}, "keydown")
-
-Mousetrap.bind("space", function ( ){
-  socket.emit("aup")
-}, "keyup")
-
-var rawway = function () {
-  document.body.ontouchstart = function (e) {
-    e.preventDefault()
-    var touch = e.touches[0]
-    point = [touch.pageX * 2, touch.pageY * 2]
-    socket.emit("touchstart", point)
-  }
-  
-  document.body.ontouchmove = function (e) {
-    e.preventDefault()
-    var touch = e.touches[0]
-    var touch2 = e.touches[1]
-    if (touch && touch2) {
-      socket.emit("touchmove", [touch.pageX * 2, touch.pageY * 2, touch2.pageX * 2, touch2.pageY * 2])
-    } else {
-      socket.emit("touchmove", [touch.pageX * 2, touch.pageY * 2])
-    }
-  }
-
-  document.body.ontouchend = function (e) {
-    e.preventDefault();
-    var touch = e.changedTouches[0]
-    socket.emit("touchend", [touch.pageX * 2, touch.pageY * 2])
-  }
-}
-
-rawway()
-
-/*
-document.body.ontouchstart = function (e) {
-  e.preventDefault();
-} 
-document.body.ontouchend = function (e) {
-  document.title = e.changedTouches[0].pageX
-  return false
-}*/
 
 
 
 
 </script>
-</body>
