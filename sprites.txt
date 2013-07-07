@@ -362,7 +362,7 @@ bomberman_back_left_foot
 
 tweak flipy bomberman_back_right_foot
 
-bomberman_right_right_foot
+bomberman_right_left_foot
 
 .oo.............
 .oo...ooooo.....
@@ -389,7 +389,7 @@ bomberman_right_right_foot
 ..xxxxxx..xxxxxx
 ...xxxx....xxxx.
 
-bomberman_right_right_foot
+bomberman_right
 
 .oo.............
 .oo...ooooo.....
@@ -415,5 +415,32 @@ bomberman_right_right_foot
 ......oxxxxx....
 .....xxxxxxx....
 .....xxxxxxx....
+
+bomberman_right_right_foot
+
+.oo.............
+.oo...ooooo.....
+...xxxooooooo...
+....xooooooooo..
+...ooooooo......
+...ooooooo..nn..
+...ooooooo...n..
+...ooooooo...n..
+...ooooooo...n..
+...ooooooo......
+....oooooooooo..
+....ooxxooooo...
+.....xxxxooo....
+....xxxxxooox.oo
+...xxxxoooooxxoo
+...xxxooooooxxoo
+...oooooooooxx..
+...oooxxxxxx....
+.....xxxoooo.xx.
+...xxoxxooooxxxx
+..xxxxoo..ooxxxx
+..xxxxx...oxxxxx
+..xxxxxx..xxxxxx
+...xxxx....xxxx.
 
 
