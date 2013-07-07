@@ -252,11 +252,17 @@ $.get("sprites.txt", function (text) {
   })
   console.log(canvasEl)
   window.open(canvasEl.toDataURL())
+  
+  $("#code").html(JSON.stringify(_.map(imgs, function (img) { return {
+      x: img.x,
+      y: img.y,
+      w: img.w,
+      h: img.h 
+    }}), null, 2))
 
 })
 
 
 
-
-
 </script>
+<pre id="code"></pre>
