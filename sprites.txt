@@ -368,12 +368,12 @@ bomberman_right_left_foot
 .oo...ooooo.....
 ...xxxooooooo...
 ....xooooooooo..
-...ooooooo......
-...ooooooo..nn..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo......
+...ooooooowwww..
+...ooooooowwnn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwww..
 ....oooooooooo..
 ....oooooxxoo...
 ....xoooxxxo....
@@ -395,12 +395,12 @@ bomberman_right
 .oo...ooooo.....
 ...xxxooooooo...
 ....xooooooooo..
-...ooooooo......
-...ooooooo..nn..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo......
+...ooooooowwww..
+...ooooooowwnn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwww..
 ....oooooooooo..
 ....ooooxxooo...
 .....ooxxxxo....
@@ -422,12 +422,12 @@ bomberman_right_right_foot
 .oo...ooooo.....
 ...xxxooooooo...
 ....xooooooooo..
-...ooooooo......
-...ooooooo..nn..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo...n..
-...ooooooo......
+...ooooooowwww..
+...ooooooowwnn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwwn..
+...ooooooowwww..
 ....oooooooooo..
 ....ooxxooooo...
 .....xxxxooo....
@@ -443,18 +443,83 @@ bomberman_right_right_foot
 ..xxxxxx..xxxxxx
 ...xxxx....xxxx.
 
+bomberman_left
+
+tweak flipy bomberman_right
+
+bomberman_left_left_foot
+
+tweak flipy bomberman_right_right_foot
+
+bomberman_left_right_foot
+
+tweak flipy bomberman_right_left_foot
+
 prf0
 
-tweak same bomberman
+same bomberman
 
 prf1
 
-tweak same bomberman_front_left_foot
+same bomberman_front_left_foot
 
 prf2
 
-tweak same bomberman
+same bomberman
 
 prf3
 
-tweak same bomberman_front_right_foot
+same bomberman_front_right_foot
+
+prr0
+
+same bomberman_right
+
+prr1
+
+same bomberman_right_left_foot
+
+prr2
+
+same bomberman_right
+
+prr3
+
+same bomberman_right_right_foot
+
+prl0
+
+same bomberman_left
+
+prl1
+
+same bomberman_left_left_foot
+
+prl2
+
+same bomberman_left
+
+prl3
+
+same bomberman_left_right_foot
+
+prb0
+
+same bomberman_back
+
+prb1
+
+same bomberman_back_left_foot
+
+prb2
+
+same bomberman_back
+
+prb3
+
+same bomberman_back_right_foot
+
+
+
+
+

@@ -234,18 +234,35 @@ bman.playerGoto = function (state, id, point) {
   point[0] = Math.round(point[0] - (player.w / 2))
   point[1] = Math.round(point[1] - (player.h / 2))
   player.going = point
+
+  var diffX = Math.abs(point[0] - player.x)
+  var diffY = Math.abs(point[1] - player.y)
+
+  var isXdirection = diffX > diffY
   if (point[0] > player.x) {
     player.dx = 1
+    if (isXdirection) {
+      player.baseImage = "prr"
+    }
   } else if (point[0] < player.x) {
     player.dx = -1
+    if (isXdirection) {
+      player.baseImage = "prl"
+    }
   } else {
     player.dx = 0
   }
 
   if (point[1] > player.y) {
     player.dy = 1
+    if (!isXdirection) {
+      player.baseImage = "prf"
+    }
   } else if (point[1] < player.y) {
     player.dy = -1
+    if (!isXdirection) {
+      player.baseImage = "prb"
+    }
   } else {
     player.dy = 0
   }
