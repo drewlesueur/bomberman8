@@ -39,11 +39,6 @@
 <script src="mousetrap.js"></script>
 <script src="config.js"></script>
 <script>
-
-var generateCanviForSprites = function (text) {
-  var spriteData = _.compact(text.trim().split("\n\n"))
-  console.log(spriteData)
-
   var redValue = function (hex) {
     return parseInt(hex.substr(0, 2), 16)
   }
@@ -59,6 +54,45 @@ var generateCanviForSprites = function (text) {
   var transparentValue = function (hex) {
     return parseInt(hex.substr(6, 2), 16) / 255
   }
+var createCanvasForSprite = function (spriteText, colors, dimsX, dimsY) {
+  var spriteLines = _.compact(spriteText.split("\n"))
+  var width = spriteLines[0].length
+  var height = spriteLines.length
+  var canvas = document.createElement("canvas")
+  // was here
+  canvas.width = gridUnitWidth * dimsX
+  canvas.height = gridUnitHeight * dimsY
+  var subPixelUnitWidth = gridUnitWidth * dimsX / width
+  var subPixelUnitHeight = gridUnitHeight * dimsY/ height
+  var c = canvas.getContext("2d")
+  _.each(spriteLines, function (spriteLine, y) {
+    if (spriteLine == "") {
+      return
+    }
+    _.times(width, function (x) {
+      var colorKey = spriteLine.substr(x, 1)
+      var colorString = colors[colorKey]
+      var r = redValue(colorString)
+      var g  = greenValue(colorString)
+      var b  = blueValue(colorString)
+      var a  = transparentValue(colorString)
+
+      c.fillStyle = "rgba("+ r +", " + g + ", " + b + ", " + a + ")"
+      c.fillRect(
+        (x * subPixelUnitWidth),
+        (y * subPixelUnitHeight),
+        (subPixelUnitWidth), 
+        (subPixelUnitHeight)
+      )
+    })
+  })
+  return canvas
+} 
+
+var generateCanviForSprites = function (text) {
+  var spriteData = _.compact(text.trim().split("\n\n"))
+  console.log(spriteData)
+
 
   var spriteTexts = {}
 
@@ -101,40 +135,6 @@ var generateCanviForSprites = function (text) {
   var dimsX = 1
   var dimsY = 1
 
-  var createCanvasForSprite = function (spriteText, colors, dimsX, dimsY) {
-    var spriteLines = _.compact(spriteText.split("\n"))
-    var width = spriteLines[0].length
-    var height = spriteLines.length
-    var canvas = document.createElement("canvas")
-    // was here
-    canvas.width = gridUnitWidth * dimsX
-    canvas.height = gridUnitHeight * dimsY
-    var subPixelUnitWidth = gridUnitWidth * dimsX / width
-    var subPixelUnitHeight = gridUnitHeight * dimsY/ height
-    var c = canvas.getContext("2d")
-    _.each(spriteLines, function (spriteLine, y) {
-      if (spriteLine == "") {
-        return
-      }
-      _.times(width, function (x) {
-        var colorKey = spriteLine.substr(x, 1)
-        var colorString = colors[colorKey]
-        var r = redValue(colorString)
-        var g  = greenValue(colorString)
-        var b  = blueValue(colorString)
-        var a  = transparentValue(colorString)
-
-        c.fillStyle = "rgba("+ r +", " + g + ", " + b + ", " + a + ")"
-        c.fillRect(
-          (x * subPixelUnitWidth),
-          (y * subPixelUnitHeight),
-          (subPixelUnitWidth), 
-          (subPixelUnitHeight)
-        )
-      })
-    })
-    return canvas
-  } 
 
   var colors = {}
   for (var i = 0; i < spriteData.length; i += 2) {
