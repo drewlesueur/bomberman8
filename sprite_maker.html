@@ -247,13 +247,17 @@ $.get("sprites.txt", function (text) {
   document.body.appendChild(canvasEl)
   var y = 0
   _.each(imgs, function (img) {
+    console.log(img)
     c.drawImage(img.img, 0, y) 
-    y += img.h
+    y = (y + img.h)
+    img.y = y
+    console.log(img.y)
   })
   console.log(canvasEl)
   window.open(canvasEl.toDataURL())
   
-  $("#code").html(JSON.stringify(_.map(imgs, function (img) { return {
+  $("#code").html(JSON.stringify(_.map(imgs, function (img, key) { return {
+      key: key,
       x: img.x,
       y: img.y,
       w: img.w,

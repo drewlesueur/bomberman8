@@ -38,9 +38,36 @@
 <script src="underscore.js"></script>
 <script src="mousetrap.js"></script>
 <script src="config.js"></script>
+<script src="sprites_generated.js"></script>
 <script>
 
 
+var s = Date.now()
+var spriteSheet = new Image()
+spriteSheet.src = "bman_sprites.png"
+spriteSheet.onload = function () {
+  _.each(spritesGenerated, function (spriteInfo) {
+    var canvas = document.createElement("canvas")
+    canvas.width = spriteInfo.w
+    canvas.height = spriteInfo.h
+    var c = canvas.getContext("2d")
+    c.drawImage(spriteSheet, spriteInfo.x, spriteInfo.y, spriteInfo.w, spriteInfo.h, 0, 0, spriteInfo.w, spriteInfo.h)
+    var pattern = c.createPattern(canvas, 'repeat')
+    var key = spriteInfo.key
+    imgs[key] = {img: canvas, x: 0, y: 0, w: spriteInfo.w, h: spriteInfo.h, pattern: pattern }
+  })
+
+  socket.on("ciwta", function (changes) {
+    console.log(changes)
+    var len = changes.length
+    for (key in changes) { // ordering? of where stuff is aka z-index
+      var change = changes[key]; 
+      if (!change) delete whereThingsAre[key]
+      else whereThingsAre[key] = change
+    }  
+    render(whereThingsAre)
+  })
+}
 
 
 var bomb = new Image()
@@ -116,16 +143,6 @@ var render = function (whereThingsAre) {
 var socket = io.connect('http://drewles.com:8015');
 var state
 var whereThingsAre = {}
-socket.on("ciwta", function (changes) {
-  console.log(changes)
-  var len = changes.length
-  for (key in changes) { // ordering? of where stuff is aka z-index
-    var change = changes[key]; 
-    if (!change) delete whereThingsAre[key]
-    else whereThingsAre[key] = change
-  }  
-  render(whereThingsAre)
-})
 
 Mousetrap.bind("left", function (e) {
   e.preventDefault()

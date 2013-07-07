@@ -10,7 +10,6 @@ g 707070ff
 o ff7000ff
 y ffff00ff
 
-
 blank
 
 ........
