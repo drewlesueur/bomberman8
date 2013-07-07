@@ -15,12 +15,14 @@ var movedValue = function (elapsed, dx, x, rate) {
 
 var maxed = function (w, x) {
   var maxX = viewWidth - w
-  return x < 0 ? 0 : x > maxX ? maxX : x
+  var minX = 0 - w
+  return x < minX ? minX : x > maxX ? maxX : x
 }
 
 var maxedY = function (w, x) {
   var maxX = viewHeight - w //- 100 // todo fix this hack!
-  return x < 0 ? 0 : x > maxX ? maxX : x
+  var minX = 0 - w
+  return x < minX ? minX : x > maxX ? maxX : x
 }
 
 var moveGoing = function (elapsed, dx, goingX, x, rate) {
@@ -130,6 +132,10 @@ var getGridValue = function (x, w, originX, gridValue) {
   return Math.floor(midX / gridValue)
 }
 
+var bombIn = function (bombsPos, gridX, gridY) {
+  return (gridX + "_" + gridY) in bombsPos
+}
+
 var bman = {};
 bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
@@ -138,10 +144,34 @@ bman.onTime = function (state, timeEvent) {
   state.playersPos = {} // clear out the old playersPositions. you could just keep it around and change the players that move from one spot to another
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
-        player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
-        player.y = maxedY(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
-        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
-        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+        var newX = maxed(player.originX, movedValue(elapsed, player.dx, player.x, player.moveRate))
+        var newY = maxedY(player.originY, movedValue(elapsed, player.dy, player.y, player.moveRate))
+        var newGridX = getGridValue(newX, player.w, player.originX, gridUnitWidth)
+        var newGridY = getGridValue(newY, player.h, player.originY, gridUnitHeight)
+
+        var oldX = player.x
+        var oldY = player.y
+        var oldGridX = player.gridX
+        var oldGridY = player.gridY
+
+        //was here
+        
+        var bombsPos = state.bombsPos
+        if (newGridX == oldGridX && newGridY == oldGridY) {
+          // do nothing
+        } else if (!bombIn(bombsPos, newGridX, newGridY)) {
+          player.x = newX
+          player.y = newY
+          player.gridX = newGridX
+          player.gridY = newGridY
+        } else if (!bombIn(bombsPos, newGridX, oldGridY)) {
+          player.x = newX
+          player.gridX = newGridX
+        } else if (!bombIn(bombsPos, oldGridX, newGridY)) {
+          player.y = newY
+          player.gridY = newGridY
+        }
+
         //setplayersPos(state, player, player.gridX, player.gridY)
         
         player.animationFrame += 0.3
@@ -159,29 +189,60 @@ bman.onTime = function (state, timeEvent) {
         state.changesInWhereThingsAre[playerId] = generateChange(player)
       }
 
+      //todo do we need this? it seems like lots of duplicate work
       var going = player.going
       if (going) {
         var goingX = going[0]
         var goingY = going[1]
+        var newX = player.x
+        var newY = player.y
+        var newGridX = player.gridX
+        var newGridY = player.gridY
+
+        var oldX = player.x
+        var oldY = player.y
+        var oldGridX = player.gridX
+        var oldGridY = player.gridY
+
         if (player.dx == -1 && player.x < goingX) {
           player.dx = 0 
-          player.x = goingX
+          var newX = goingX
+          //player.x = goingX
         } else if (player.dx == 1 && player.x > goingX) {
           player.dx = 0 
-          player.x = goingX
+          //player.x = goingX
+          var newX = goingX
         }
 
         if (player.dy == -1 && player.y < goingY) {
           player.dy = 0 
-          player.y = goingY
+          //player.y = goingY
+          var newY = goingY
         } else if (player.dy == 1 && player.y > goingY) {
           player.dy = 0 
-          player.y = goingY
+          //player.y = goingY
+          var newY = goingY
         }
         // TODO: hthis might not have changed, you could prob optimize this
-        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
-        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+        newGridX = getGridValue(newX, player.w, player.originX, gridUnitWidth)
+        newGridY = getGridValue(newY, player.h, player.originY, gridUnitHeight)
         //setplayersPos(state, player, player.gridX, player.gridY)
+        
+        var bombsPos = state.bombsPos
+        if (newGridX == oldGridX && newGridY == oldGridY) {
+          // do nothing
+        } else if (!bombIn(bombsPos, newGridX, newGridY)) {
+          player.x = newX
+          player.y = newY
+          player.gridX = newGridX
+          player.gridY = newGridY
+        } else if (!bombIn(bombsPos, newGridX, oldGridY)) {
+          player.x = newX
+          player.gridX = newGridX
+        } else if (!bombIn(bombsPos, oldGridX, newGridY)) {
+          player.y = newY
+          player.gridY = newGridY
+        }
 
         state.hasChanges = true
         // todo: maybe have a global where things are
@@ -206,7 +267,6 @@ bman.onTime = function (state, timeEvent) {
   var bombsPos = state.bombsPos
   var bombs = state.bombs
   _.each(bombs, function (bomb, bombId) {
-   // was here bomb  
     bomb.fuse -= elapsed 
     if (state.time - bomb.animTime >= 250) {
       bomb.animIndex = !bomb.animIndex // boolean animation
@@ -368,8 +428,8 @@ bman.moveDiff = function (state, id, point) {
         var x = point[0]
         var y = point[1]
         var player = state.players[id]
-        player.x = maxed(player.w, player.x + x)
-        player.y = maxedY(player.h, player.y + y)
+        player.x = maxed(player.originX, player.x + x)
+        player.y = maxedY(player.originY, player.y + y)
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
@@ -406,11 +466,11 @@ bman.aDown = function (state, id) {
         w: gridUnitWidth,
         h: gridUnitHeight,
         originX: gridUnitWidth / 2,
-        originY: gridUnitHeight / 2,
+        originY: gridUnitHeight * 1.5 / 2,
         img: "bomb",
         animIndex: 0,
         start: state.time,
-        fuse: 3000,
+        fuse: 300000,
         color: "444",
         player: player,
         length: 15,
@@ -461,7 +521,7 @@ bman.onConnect = function (state, id) {
     x: 100,
     y: 100,
     originX: gridUnitWidth / 2,
-    originY: gridUnitHeight / 2,
+    originY: gridUnitHeight * 1.5 / 2,
     img: baseImage + direction + 0,
     originalImg: img,
     moveRate: 2/1,
@@ -469,7 +529,7 @@ bman.onConnect = function (state, id) {
     dy: 0,
     w: gridUnitWidth,
     h: gridUnitHeight * 1.5,
-    bombs: 10,
+    bombs: 100,
     bombTime: 0,
     id: id
   }
