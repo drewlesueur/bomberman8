@@ -148,7 +148,7 @@ bman.onTime = function (state, timeEvent) {
         if (player.animationFrame >= 4) {
           player.animationFrame = 0
         }
-        player.img = player.baseImage + Math.floor(player.animationFrame)
+        player.img = player.baseImage + player.direction + Math.floor(player.animationFrame)
 
         // it might be already maxed out but oh well
         state.hasChanges = true
@@ -242,12 +242,12 @@ bman.playerGoto = function (state, id, point) {
   if (point[0] > player.x) {
     player.dx = 1
     if (isXdirection) {
-      player.baseImage = "prr"
+      player.direction = "r"
     }
   } else if (point[0] < player.x) {
     player.dx = -1
     if (isXdirection) {
-      player.baseImage = "prl"
+      player.direction = "l"
     }
   } else {
     player.dx = 0
@@ -256,12 +256,12 @@ bman.playerGoto = function (state, id, point) {
   if (point[1] > player.y) {
     player.dy = 1
     if (!isXdirection) {
-      player.baseImage = "prf"
+      player.direction = "f"
     }
   } else if (point[1] < player.y) {
     player.dy = -1
     if (!isXdirection) {
-      player.baseImage = "prb"
+      player.direction = "b"
     }
   } else {
     player.dy = 0
@@ -439,7 +439,8 @@ bman.onConnect = function (state, id) {
     // 0_0
   var player = {
     touchStarts: 0,
-    baseImage: "prf",
+    baseImage: "pr",
+    direction: "f",
     animationFrame: 0,
     x: 100,
     y: 100,
