@@ -206,7 +206,15 @@ bman.onTime = function (state, timeEvent) {
   var bombsPos = state.bombsPos
   var bombs = state.bombs
   _.each(bombs, function (bomb, bombId) {
+   // was here bomb  
     bomb.fuse -= elapsed 
+    if (state.time - bomb.animTime >= 250) {
+      bomb.animIndex = !bomb.animIndex // boolean animation
+      bomb.img = bomb.animIndex == 0 ? "bomb" : "bomb2"
+      bomb.animTime = state.time
+      state.hasChanges = true 
+      state.changesInWhereThingsAre[bomb.id] = generateChange(bomb)
+    }
     if (bomb.fuse <= 0) {
       detinateBomb(state, bomb, bombId)
     }
@@ -400,11 +408,13 @@ bman.aDown = function (state, id) {
         originX: gridUnitWidth / 2,
         originY: gridUnitHeight / 2,
         img: "bomb",
+        animIndex: 0,
         start: state.time,
         fuse: 3000,
         color: "444",
         player: player,
-        length: 15
+        length: 15,
+        animTime: state.time
       }
 
       state.bombs[bombId] = bomb
