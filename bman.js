@@ -423,7 +423,7 @@ bman.onDisconnect = function (state, id) {
   state.changesInWhereThingsAre[id] = null
 } 
 
-var playerImages = ["p", "p2", "p3", "p4", "p5", "p6", "p7"] //, "p8"]
+var playerImages = ["pninja"]//["pr", "pb", "po", "px", "pw", "pp", "pg", "pt", "pgold", "pninja"] //, "p8"]
 var playerImageIndex = 0
 var nextPlayer = function () {
   var playerImage = playerImages[playerImageIndex]
@@ -437,16 +437,18 @@ var nextPlayer = function () {
 bman.onConnect = function (state, id) {
   var img = "prf0"//nextPlayer()
     // 0_0
+  var baseImage = nextPlayer()
+  var direction = "f"
   var player = {
     touchStarts: 0,
-    baseImage: "pr",
-    direction: "f",
+    baseImage: baseImage,
+    direction: direction,
     animationFrame: 0,
     x: 100,
     y: 100,
     originX: gridUnitWidth / 2,
     originY: gridUnitHeight / 2,
-    img: img,
+    img: baseImage + direction + 0,
     originalImg: img,
     moveRate: 2/1,
     dx: 0,
