@@ -143,6 +143,12 @@ bman.onTime = function (state, timeEvent) {
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         //setplayersPos(state, player, player.gridX, player.gridY)
+        
+        player.animationFrame += 0.3
+        if (player.animationFrame >= 4) {
+          player.animationFrame = 0
+        }
+        player.img = player.baseImage + Math.floor(player.animationFrame)
 
         // it might be already maxed out but oh well
         state.hasChanges = true
@@ -412,10 +418,12 @@ var nextPlayer = function () {
 }
 
 bman.onConnect = function (state, id) {
-  var img = "p2"//nextPlayer()
+  var img = "prf0"//nextPlayer()
     // 0_0
   var player = {
     touchStarts: 0,
+    baseImage: "prf",
+    animationFrame: 0,
     x: 100,
     y: 100,
     originX: gridUnitWidth / 2,

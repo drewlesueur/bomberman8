@@ -299,10 +299,10 @@ bomberman_front_right_foot
 .....xxxxxx.o.o.
 .....oxxxxo.....
 ....oooxxooo....
-...xxxo..ooo....
-...xxxx..ooo....
-...xxxx..xxx....
-...xxxx.........
+....ooo..oxxx...
+....ooo..xxxx...
+....xxx..xxxx...
+.........xxxx...
 
 bomberman_back
 
@@ -443,4 +443,18 @@ bomberman_right_right_foot
 ..xxxxxx..xxxxxx
 ...xxxx....xxxx.
 
+prf0
 
+tweak same bomberman
+
+prf1
+
+tweak same bomberman_front_left_foot
+
+prf2
+
+tweak same bomberman
+
+prf3
+
+tweak same bomberman_front_right_foot
