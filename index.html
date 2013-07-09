@@ -41,7 +41,7 @@
 <script src="sprites_generated.js"></script>
 <script>
 
-
+var port = config.port
 var s = Date.now()
 var spriteSheet = new Image()
 spriteSheet.src = "bman_sprites.png"
@@ -57,7 +57,7 @@ spriteSheet.onload = function () {
     imgs[key] = {img: canvas, x: 0, y: 0, w: spriteInfo.w, h: spriteInfo.h, pattern: pattern }
   })
 
-  socket = io.connect('http://drewles.com:8015');
+  socket = io.connect('http://drewles.com:' + port);
   socket.on("ciwta", function (changes) {
     console.log(changes)
     var len = changes.length

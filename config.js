@@ -8,6 +8,7 @@ root.config = {
   viewHeight: viewDimension,
   gridWidth: gridDimension,
   gridHeight: gridDimension,
+  port: 8016
 }
 
 

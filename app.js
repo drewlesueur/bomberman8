@@ -1,8 +1,9 @@
 // todo: since you are only sending changes, for new connections,
 // send the whole state
 _ = require("./underscore.js")
+require("./config.js") // gives us the global config variable
 //hi bman4
-var io = require('socket.io').listen(8015, {log: false});
+var io = require('socket.io').listen(config.port, {log: false});
 
 var bman = require("./bman.js")
 
