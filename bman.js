@@ -51,9 +51,25 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
           }
         }
 
+        var flamesPlayer = bomb.player
+
         if (flamePosKey in state.playersPos) {
           _.each(state.playersPos[flamePosKey], function (player){
             // was here
+            if (flamesPlayer != player && !player.dead) {
+              flamesPlayer.points += 1
+              if (flamesPlayer.points == 3) {
+                console.log(flamesPlayer.id + " wins")
+                flamesPlayer.won = true
+                _.each(state.players, function (player) {
+                  player.points = 0  
+                })
+                flamesPlayer.winTime = 0
+                flamesPlayer.img = flamesPlayer.baseImage + "w"
+                state.hasChanges = true
+                state.changesInWhereThingsAre[flamesPlayer.id] = generateChange(flamesPlayer)
+              }
+            }
             player.deadTime = 0
             player.dead = true
             player.img = player.baseImage + "l"
@@ -154,7 +170,7 @@ bman.onTime = function (state, timeEvent) {
           player.baseImage = nextPlayer()
         }
 
-        if (!player.dead) {
+        if (!player.dead && !player.won) {
           player.img = player.baseImage + player.direction + Math.floor(player.animationFrame)
         }
 
@@ -202,6 +218,17 @@ bman.onTime = function (state, timeEvent) {
           state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
       }
+
+      if (player.won) {
+        player.winTime += elapsed
+        if (player.winTime >= 3000) {
+          player.won = false
+          player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
+          state.hasChanges = true
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
+        }
+      }
+
       // todo you could maybe use a setPlayersPos when the position chagnes, but then you would have to clear out the old ones.
       // that woudl probably be faster?
       setplayersPos(state, player, player.gridX, player.gridY)
@@ -392,6 +419,9 @@ bman.aDown = function (state, id) {
   var player = state.players[id]
   var x = player.gridX
   var y = player.gridY
+  if (player.dead) {
+    return
+  }
   //if (player.bombs > 0 && (state.time - player.bombTime > 100)) {
   if (player.bombs > 0 ) {
     player.bombTime = state.time
@@ -476,6 +506,7 @@ bman.onConnect = function (state, id) {
     h: gridUnitHeight * 1.5,
     bombs: 10,
     bombTime: 0,
+    points: 0,
     id: id
   }
   state.players[id] = player
