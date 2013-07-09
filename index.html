@@ -57,6 +57,7 @@ spriteSheet.onload = function () {
     imgs[key] = {img: canvas, x: 0, y: 0, w: spriteInfo.w, h: spriteInfo.h, pattern: pattern }
   })
 
+  socket = io.connect('http://drewles.com:8015');
   socket.on("ciwta", function (changes) {
     console.log(changes)
     var len = changes.length
@@ -67,6 +68,7 @@ spriteSheet.onload = function () {
     }  
     render(whereThingsAre)
   })
+  render(whereThingsAre)
 }
 
 
@@ -140,7 +142,7 @@ var render = function (whereThingsAre) {
   }
 }
 
-var socket = io.connect('http://drewles.com:8015');
+var socket
 var state
 var whereThingsAre = {}
 

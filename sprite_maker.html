@@ -248,9 +248,9 @@ $.get("sprites.txt", function (text) {
   var y = 0
   _.each(imgs, function (img) {
     console.log(img)
+    img.y = y
     c.drawImage(img.img, 0, y) 
     y = (y + img.h)
-    img.y = y
     console.log(img.y)
   })
   console.log(canvasEl)
