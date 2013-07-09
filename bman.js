@@ -53,9 +53,10 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
 
         if (flamePosKey in state.playersPos) {
           _.each(state.playersPos[flamePosKey], function (player){
-            player.img = "d"
+            // was here
             player.deadTime = 0
             player.dead = true
+            player.img = player.baseImage + "l"
             state.hasChanges = true
             state.changesInWhereThingsAre[player.id] = generateChange(player)
            // player.bombs = -1
@@ -74,7 +75,8 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
       img: img,
       originX: gridUnitWidth / 2,
       originY: gridUnitHeight / 2,
-      duration: 300
+      duration: 300,
+      player: bomb.player
     }
     // TODO : maybe make the flame 4 units total. you can set the height and width?
     flames[flameId] = flame 
@@ -151,7 +153,10 @@ bman.onTime = function (state, timeEvent) {
         if (player.flashy) {
           player.baseImage = nextPlayer()
         }
-        player.img = player.baseImage + player.direction + Math.floor(player.animationFrame)
+
+        if (!player.dead) {
+          player.img = player.baseImage + player.direction + Math.floor(player.animationFrame)
+        }
 
         // it might be already maxed out but oh well
         state.hasChanges = true
@@ -190,9 +195,9 @@ bman.onTime = function (state, timeEvent) {
 
       if (player.dead) {
         player.deadTime += elapsed
-        if (player.deadTime >= 2000) {
+        if (player.deadTime >= 3000) {
           player.dead = false
-          player.img = player.originalImg
+          player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
           state.hasChanges = true
           state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
@@ -461,7 +466,7 @@ bman.onConnect = function (state, id) {
     x: 100,
     y: 100,
     originX: gridUnitWidth / 2,
-    originY: gridUnitHeight / 2,
+    originY: gridUnitHeight * 1.5 / 2,
     img: baseImage + direction + 0,
     originalImg: img,
     moveRate: 2/1,

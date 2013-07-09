@@ -173,6 +173,7 @@ $.get("sprites.txt", function (text) {
   var colors = imageInfo.colors
 
   var toChangeColor = [
+  "prl", "prw",
   "prf0", "prf1", "prf2", "prf3",
   "prr0", "prr1", "prr2", "prr3",
   "prl0", "prl1", "prl2", "prl3",
@@ -254,6 +255,7 @@ $.get("sprites.txt", function (text) {
     console.log(img.y)
   })
   console.log(canvasEl)
+  // TODO: uncomment the next line
   window.open(canvasEl.toDataURL())
   
   $("#code").html(JSON.stringify(_.map(imgs, function (img, key) { return {
@@ -269,4 +271,4 @@ $.get("sprites.txt", function (text) {
 
 
 </script>
-<pre id="code"></pre>
+<textarea id="code"></textarea>
