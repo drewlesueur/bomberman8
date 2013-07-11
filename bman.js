@@ -14,14 +14,12 @@ var movedValue = function (elapsed, dx, x, rate) {
 }
 
 var maxed = function (w, x) {
+
   var maxX = viewWidth - w
-  return x < 0 ? 0 : x > maxX ? maxX : x
+  var minX = 0 - w
+  return x < minX ? minX : x > maxX ? maxX : x
 }
 
-var maxedY = function (w, x) {
-  var maxX = viewHeight - w //- 100 // todo fix this hack!
-  return x < 0 ? 0 : x > maxX ? maxX : x
-}
 
 var moveGoing = function (elapsed, dx, goingX, x, rate) {
   newX =  x + (elapsed * rate * dx)
@@ -58,7 +56,7 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
             // was here
             if (flamesPlayer != player && !player.dead) {
               flamesPlayer.points += 1
-              if (flamesPlayer.points == 3) {
+              if (flamesPlayer.points == 1) {
                 console.log(flamesPlayer.id + " wins")
                 flamesPlayer.won = true
                 _.each(state.players, function (player) {
@@ -105,7 +103,7 @@ var addFlames = function (state, bomb) {
   bombs = state.bombs
   var bombX = bomb.gridX
   var bombY = bomb.gridY
-  var len = bomb.length || 5
+  var len = bomb.length || 3
   addFlame(state, bomb, bombX + 1, bombY, len,  1, "fr") //flame right
   addFlame(state, bomb, bombX - len, bombY, len, 1, "fl") // flame left
   addFlame(state, bomb, bombX, bombY + 1, 1, len, "fd")
@@ -148,16 +146,25 @@ var getGridValue = function (x, w, originX, gridValue) {
   return Math.floor(midX / gridValue)
 }
 
+var bombIn = function (bombsPos, gridX, gridY) {
+  return (gridX + "_" + gridY) in bombsPos
+}
+
 var bman = {};
 bman.onTime = function (state, timeEvent) {
   var elapsed = timeEvent.elapsed
   //state.elapsed = timeEvent.elapsed // you might need this?
   state.time = timeEvent.time
   state.playersPos = {} // clear out the old playersPositions. you could just keep it around and change the players that move from one spot to another
+  var bombsPos = state.bombsPos
   _.each(state.players, function (player, playerId) {
       if (player.dx != 0 || player.dy != 0) {
-        player.x = maxed(player.w, movedValue(elapsed, player.dx, player.x, player.moveRate))
-        player.y = maxedY(player.h, movedValue(elapsed, player.dy, player.y, player.moveRate))
+        var oldX = player.x
+        var oldY = player.y
+        var oldGridX = player.gridX
+        var oldGridY = player.gridY
+        player.x = maxed(player.originX, movedValue(elapsed, player.dx, player.x, player.moveRate))
+        player.y = maxed(player.originY, movedValue(elapsed, player.dy, player.y, player.moveRate))
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         //setplayersPos(state, player, player.gridX, player.gridY)
@@ -178,36 +185,48 @@ bman.onTime = function (state, timeEvent) {
         state.hasChanges = true
         // TODO: round?
         state.changesInWhereThingsAre[playerId] = generateChange(player)
-      }
 
-      var going = player.going
-      if (going) {
-        var goingX = going[0]
-        var goingY = going[1]
-        if (player.dx == -1 && player.x < goingX) {
-          player.dx = 0 
-          player.x = goingX
-        } else if (player.dx == 1 && player.x > goingX) {
-          player.dx = 0 
-          player.x = goingX
+        var going = player.going
+        if (going) {
+          var goingX = going[0]
+          var goingY = going[1]
+          if (player.dx == -1 && player.x < goingX) {
+            player.dx = 0 
+            player.x = goingX
+          } else if (player.dx == 1 && player.x > goingX) {
+            player.dx = 0 
+            player.x = goingX
+          }
+
+          if (player.dy == -1 && player.y < goingY) {
+            player.dy = 0 
+            player.y = goingY
+          } else if (player.dy == 1 && player.y > goingY) {
+            player.dy = 0 
+            player.y = goingY
+          }
+          // TODO: hthis might not have changed, you could prob optimize this
+          player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
+          player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
+          //setplayersPos(state, player, player.gridX, player.gridY)
+
+          state.hasChanges = true
+          // todo: maybe have a global where things are
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
 
-        if (player.dy == -1 && player.y < goingY) {
-          player.dy = 0 
-          player.y = goingY
-        } else if (player.dy == 1 && player.y > goingY) {
-          player.dy = 0 
-          player.y = goingY
+        console.log(player.gridX, oldGridX, player.gridY, oldGridY)
+        if ((player.gridX != oldGridX || player.gridY != oldGridY) && bombIn(bombsPos, player.gridX, player.gridY)) {
+          player.x = oldX
+          player.y = oldY
+          player.gridX = oldGridX
+          player.gridY = oldGridY
+          state.hasChanges = true
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
-        // TODO: hthis might not have changed, you could prob optimize this
-        player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
-        player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
-        //setplayersPos(state, player, player.gridX, player.gridY)
-
-        state.hasChanges = true
-        // todo: maybe have a global where things are
-        state.changesInWhereThingsAre[playerId] = generateChange(player)
+        
       }
+
 
       if (player.dead) {
         player.deadTime += elapsed
@@ -221,7 +240,7 @@ bman.onTime = function (state, timeEvent) {
 
       if (player.won) {
         player.winTime += elapsed
-        if (player.winTime >= 3000) {
+        if (player.winTime >= 6000) {
           player.won = false
           player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
           state.hasChanges = true
@@ -401,7 +420,7 @@ bman.moveDiff = function (state, id, point) {
         var y = point[1]
         var player = state.players[id]
         player.x = maxed(player.w, player.x + x)
-        player.y = maxedY(player.h, player.y + y)
+        player.y = maxed(player.h, player.y + y)
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
@@ -445,9 +464,10 @@ bman.aDown = function (state, id) {
         img: "bomb",
         animIndex: 0,
         start: state.time,
-        fuse: 3000,
+        fuse: 300000,
         color: "444",
         player: player,
+        //length: 3,
         length: 15,
         animTime: state.time
       }
@@ -496,10 +516,12 @@ bman.onConnect = function (state, id) {
     x: 100,
     y: 100,
     originX: gridUnitWidth / 2,
-    originY: gridUnitHeight * 1.5 / 2,
+    //originY: gridUnitHeight * 1.5 / 2,
+    originY: gridUnitHeight * 1.5 * .75,
     img: baseImage + direction + 0,
     originalImg: img,
     moveRate: 2/1,
+   // moveRate: 1/5,
     dx: 0,
     dy: 0,
     w: gridUnitWidth,
