@@ -42,6 +42,7 @@ var moveGoing = function (elapsed, dx, goingX, x, rate) {
 }
 
 var youWin = function (state, winningPlayer) {
+  winningPlayer.won = true
   winningPlayer.winTime = 0
   winningPlayer.img = winningPlayer.baseImage + "w"
   state.hasChanges = true
@@ -69,8 +70,10 @@ var youDied = function (state, player) {
     var playersLeft = livingPlayers.length
     if (playersLeft == 1) {
       youWin(state, livingPlayers[0])
+      console.log("resetting players")
       resetPlayers(state.players)
     } else if (playersLeft == 0) {
+      console.log("resetting players 2")
       resetPlayers(state.players)
     }
 }
@@ -310,10 +313,10 @@ bman.onTime = function (state, timeEvent) {
       }
 
 
-      if (player.dead /*&& player.shouldComeBack*/) {
-        player.shouldComeBack = false
+      if (player.dead && player.shouldComeBack) {
         player.deadTime += elapsed
         if (player.deadTime >= 3000) {
+          player.shouldComeBack = false
           player.dead = false
           player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
           state.hasChanges = true
@@ -364,7 +367,7 @@ bman.onTime = function (state, timeEvent) {
     }
   })
 
-  console.log(_.keys(state.players).length)
+  //console.log(_.keys(state.players).length)
 
   //console.log(Date.now() - s)
 } 
@@ -557,7 +560,7 @@ bman.aDown = function (state, id) {
         img: "bomb",
         animIndex: 0,
         start: state.time,
-        fuse: 30000,
+        fuse: 3000,
         color: "444",
         player: player,
         length: 2,
