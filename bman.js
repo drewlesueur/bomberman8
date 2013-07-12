@@ -152,6 +152,7 @@ var bombIn = function (bombsPos, gridX, gridY) {
 
 var bman = {};
 bman.onTime = function (state, timeEvent) {
+  var s = Date.now()
   var elapsed = timeEvent.elapsed
   //state.elapsed = timeEvent.elapsed // you might need this?
   state.time = timeEvent.time
@@ -192,7 +193,7 @@ bman.onTime = function (state, timeEvent) {
           var goingY = going[1]
           if (player.dx == -1 && player.x < goingX) {
             player.dx = 0 
-            player.x = goingX
+           player.x = goingX
           } else if (player.dx == 1 && player.x > goingX) {
             player.dx = 0 
             player.x = goingX
@@ -215,7 +216,64 @@ bman.onTime = function (state, timeEvent) {
           state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
 
-        console.log(player.gridX, oldGridX, player.gridY, oldGridY)
+
+        var resetPlayer = function (player, x, y, gridX, gridY) {
+          player.x = x
+          player.y = y
+          player.gridX = gridX
+          player.gridY = gridY
+          state.hasChanges = true
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
+
+        }
+        console.log("gridx" + oldGridX + " " + player.gridX)
+        if (player.gridX != oldGridX) {
+          if (oldGridX < player.gridX) {
+            for (var tmpX = oldGridX + 1; tmpX <= player.gridX; tmpX++) {
+              console.log("checking " + tmpX)
+              if (bombIn(bombsPos, tmpX,  player.gridY)) {
+                console.log("resetx", oldGridX, player.gridX, tmpX - 1)
+               
+               resetPlayer(player, (tmpX) * gridUnitWidth - player.originX, player.y, tmpX - 1, player.gridY)
+                //oldGridY = player.gridY
+                break
+              }
+            }
+          } else if (oldGridX > player.gridX) {
+            for (var tmpX = oldGridX - 1; tmpX >= player.gridX; tmpX--) {
+              if (bombIn(bombsPos, tmpX,  player.gridY)) {
+                console.log("resetx2", oldGridX, player.gridX, tmpX - 1)
+                //resetPlayer(player, oldX, oldY, oldGridX, oldGridY)
+                resetPlayer(player, (tmpX + 1) * gridUnitWidth - player.originX, player.y, tmpX + 1, player.gridY)
+                //oldGridY = player.gridY
+                break
+              }
+            }
+          }
+        }
+
+        if ( player.gridY != oldGridY) {
+          if (oldGridY < player.gridY) {
+            for (var tmpY = oldGridY + 1; tmpY <= player.gridY; tmpY++) {
+              if (bombIn(bombsPos, player.gridX,  tmpY)) {
+                console.log("resety", player.gridY, tmpY - 1)
+                resetPlayer(player, player.x, (tmpY) * gridUnitHeight - player.originY, player.gridX, tmpY - 1)
+                break
+              }
+            }
+          } else if (oldGridY > player.gridY) {
+            for (var tmpY = oldGridY - 1; tmpY >= player.gridY; tmpY--) {
+              if (bombIn(bombsPos, player.gridX,  tmpY)) {
+                console.log("resety2", player.gridY, tmpY + 1)
+                resetPlayer(player, player.x, (tmpY + 1) * gridUnitHeight - player.originY - 1, player.gridX, tmpY + 1)
+                break
+              }
+            }
+          }
+        }
+
+
+       /* 
         if ((player.gridX != oldGridX || player.gridY != oldGridY) && bombIn(bombsPos, player.gridX, player.gridY)) {
           player.x = oldX
           player.y = oldY
@@ -224,6 +282,7 @@ bman.onTime = function (state, timeEvent) {
           state.hasChanges = true
           state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
+        */
         
       }
 
@@ -281,6 +340,7 @@ bman.onTime = function (state, timeEvent) {
     }
   })
 
+  //console.log(Date.now() - s)
 } 
 
 bman.playerMoveX = function (state, id, direction) {
@@ -520,13 +580,13 @@ bman.onConnect = function (state, id) {
     originY: gridUnitHeight * 1.5 * .75,
     img: baseImage + direction + 0,
     originalImg: img,
-    moveRate: 2/1,
-   // moveRate: 1/5,
+    //moveRate: 1/2,
+    moveRate: 2,
     dx: 0,
     dy: 0,
     w: gridUnitWidth,
     h: gridUnitHeight * 1.5,
-    bombs: 10,
+    bombs: 20,
     bombTime: 0,
     points: 0,
     id: id
