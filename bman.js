@@ -216,7 +216,8 @@ bman.onTime = function (state, timeEvent) {
           state.changesInWhereThingsAre[playerId] = generateChange(player)
         }
 
-
+        // todo: don't auto set player.x player.gridx player.y player.gridy.
+        // set new variables like newX newY etc. Watch out for your newY down below
         var resetPlayer = function (player, x, y, gridX, gridY) {
           player.x = x
           player.y = y
@@ -226,31 +227,42 @@ bman.onTime = function (state, timeEvent) {
           state.changesInWhereThingsAre[playerId] = generateChange(player)
 
         }
+
+        var newY = player.y
+        var newGridY = player.gridY
+
         console.log("gridx" + oldGridX + " " + player.gridX)
         if (player.gridX != oldGridX) {
           if (oldGridX < player.gridX) {
             for (var tmpX = oldGridX + 1; tmpX <= player.gridX; tmpX++) {
               console.log("checking " + tmpX)
-              if (bombIn(bombsPos, tmpX,  player.gridY)) {
+              if (bombIn(bombsPos, tmpX,  oldGridY)) {
                 console.log("resetx", oldGridX, player.gridX, tmpX - 1)
                
-               resetPlayer(player, (tmpX) * gridUnitWidth - player.originX, player.y, tmpX - 1, player.gridY)
-                //oldGridY = player.gridY
+               resetPlayer(player, (tmpX) * gridUnitWidth - player.originX, oldY, tmpX - 1, oldGridY)
+                //oldX = player.x
+                //oldGridX = player.gridX
+                ////oldGridY = player.gridY
                 break
               }
             }
           } else if (oldGridX > player.gridX) {
             for (var tmpX = oldGridX - 1; tmpX >= player.gridX; tmpX--) {
-              if (bombIn(bombsPos, tmpX,  player.gridY)) {
+              if (bombIn(bombsPos, tmpX,  oldGridY)) {
                 console.log("resetx2", oldGridX, player.gridX, tmpX - 1)
                 //resetPlayer(player, oldX, oldY, oldGridX, oldGridY)
-                resetPlayer(player, (tmpX + 1) * gridUnitWidth - player.originX, player.y, tmpX + 1, player.gridY)
-                //oldGridY = player.gridY
+                resetPlayer(player, (tmpX + 1) * gridUnitWidth - player.originX, oldY, tmpX + 1, oldGridY)
+                //oldX = player.x
+               // oldGridX = player.gridX
+                ////oldGridY = player.gridY
                 break
               }
             }
           }
         }
+
+        player.y = newY
+        player.gridY = newGridY
 
         if ( player.gridY != oldGridY) {
           if (oldGridY < player.gridY) {
@@ -580,7 +592,7 @@ bman.onConnect = function (state, id) {
     originY: gridUnitHeight * 1.5 * .75,
     img: baseImage + direction + 0,
     originalImg: img,
-    //moveRate: 1/2,
+   // moveRate: 1/7,
     moveRate: 2,
     dx: 0,
     dy: 0,
