@@ -18,10 +18,10 @@ var maxed = function (player, w, x) {
   var maxX = viewWidth - w
   var minX = 0 - w
   if (x < minX) {
-    resetTouchStart(player)
+    //resetTouchStart(player)
     return minX
   } else if (x > maxX) {
-    resetTouchStart(player)
+    //resetTouchStart(player)
     return maxX
   } else {
     return x
@@ -192,6 +192,7 @@ bman.onTime = function (state, timeEvent) {
         var oldY = player.y
         var oldGridX = player.gridX
         var oldGridY = player.gridY
+        //TODO: resettouchstart if maxed is found.
         player.x = maxed(player, player.originX, movedValue(elapsed, player.dx, player.x, player.moveRate))
         player.y = maxed(player, player.originY, movedValue(elapsed, player.dy, player.y, player.moveRate))
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
