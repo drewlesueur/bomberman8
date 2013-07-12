@@ -225,19 +225,15 @@ bman.onTime = function (state, timeEvent) {
           player.gridY = gridY
           state.hasChanges = true
           state.changesInWhereThingsAre[playerId] = generateChange(player)
-
         }
 
         var newY = player.y
         var newGridY = player.gridY
 
-        console.log("gridx" + oldGridX + " " + player.gridX)
         if (player.gridX != oldGridX) {
           if (oldGridX < player.gridX) {
             for (var tmpX = oldGridX + 1; tmpX <= player.gridX; tmpX++) {
-              console.log("checking " + tmpX)
               if (bombIn(bombsPos, tmpX,  oldGridY)) {
-                console.log("resetx", oldGridX, player.gridX, tmpX - 1)
                
                resetPlayer(player, (tmpX) * gridUnitWidth - player.originX, oldY, tmpX - 1, oldGridY)
                 //oldX = player.x
@@ -249,7 +245,6 @@ bman.onTime = function (state, timeEvent) {
           } else if (oldGridX > player.gridX) {
             for (var tmpX = oldGridX - 1; tmpX >= player.gridX; tmpX--) {
               if (bombIn(bombsPos, tmpX,  oldGridY)) {
-                console.log("resetx2", oldGridX, player.gridX, tmpX - 1)
                 //resetPlayer(player, oldX, oldY, oldGridX, oldGridY)
                 resetPlayer(player, (tmpX + 1) * gridUnitWidth - player.originX, oldY, tmpX + 1, oldGridY)
                 //oldX = player.x
@@ -268,7 +263,6 @@ bman.onTime = function (state, timeEvent) {
           if (oldGridY < player.gridY) {
             for (var tmpY = oldGridY + 1; tmpY <= player.gridY; tmpY++) {
               if (bombIn(bombsPos, player.gridX,  tmpY)) {
-                console.log("resety", player.gridY, tmpY - 1)
                 resetPlayer(player, player.x, (tmpY) * gridUnitHeight - player.originY, player.gridX, tmpY - 1)
                 break
               }
@@ -276,7 +270,6 @@ bman.onTime = function (state, timeEvent) {
           } else if (oldGridY > player.gridY) {
             for (var tmpY = oldGridY - 1; tmpY >= player.gridY; tmpY--) {
               if (bombIn(bombsPos, player.gridX,  tmpY)) {
-                console.log("resety2", player.gridY, tmpY + 1)
                 resetPlayer(player, player.x, (tmpY + 1) * gridUnitHeight - player.originY - 1, player.gridX, tmpY + 1)
                 break
               }
@@ -284,29 +277,17 @@ bman.onTime = function (state, timeEvent) {
           }
         }
 
-
-       /* 
-        if ((player.gridX != oldGridX || player.gridY != oldGridY) && bombIn(bombsPos, player.gridX, player.gridY)) {
-          player.x = oldX
-          player.y = oldY
-          player.gridX = oldGridX
-          player.gridY = oldGridY
-          state.hasChanges = true
-          state.changesInWhereThingsAre[playerId] = generateChange(player)
-        }
-        */
-        
       }
 
 
       if (player.dead) {
-        player.deadTime += elapsed
-        if (player.deadTime >= 3000) {
-          player.dead = false
-          player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
-          state.hasChanges = true
-          state.changesInWhereThingsAre[playerId] = generateChange(player)
-        }
+        //player.deadTime += elapsed
+        //if (player.deadTime >= 3000) {
+        //  player.dead = false
+        //  player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
+        //  state.hasChanges = true
+        //  state.changesInWhereThingsAre[playerId] = generateChange(player)
+        //}
       }
 
       if (player.won) {
@@ -351,6 +332,8 @@ bman.onTime = function (state, timeEvent) {
       state.changesInWhereThingsAre[flame.id] = null 
     }
   })
+
+  //console.log(_.keys(state.bombs).length)
 
   //console.log(Date.now() - s)
 } 
@@ -516,8 +499,7 @@ bman.aDown = function (state, id) {
   //if (player.bombs > 0 && (state.time - player.bombTime > 100)) {
   if (player.bombs > 0 ) {
     player.bombTime = state.time
-    var bombKey = x + "_" + y
-    if (bombKey in state.bombs) {
+    if (bombIn(state.bombsPos, x, y)) {
 
     } else {
       // was here
@@ -536,10 +518,9 @@ bman.aDown = function (state, id) {
         img: "bomb",
         animIndex: 0,
         start: state.time,
-        fuse: 300000,
+        fuse: 3000,
         color: "444",
         player: player,
-        //length: 3,
         length: 15,
         animTime: state.time
       }

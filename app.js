@@ -16,8 +16,10 @@ var state = {
   players: {},
   bombs: {},
   flames: {},
+  bricks: {},
   playersPos: {},
   bombsPos: {},
+  bricksPos: {}, //things you can run into
   flamesPos: {},
   changesInWhereThingsAre: {}
 }
@@ -114,6 +116,7 @@ var tick = function (state, timeEvent) {
   state.changesInWhereThingsAre = {}
   setTimeout(function() {
     tick(state, timeEvent)
+  //}, 32) 
   }, 32) 
 }
 
