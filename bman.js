@@ -39,6 +39,12 @@ var youWin = function (state, winningPlayer) {
   state.changesInWhereThingsAre[winningPlayer.id] = generateChange(winningPlayer)
 }
 
+var resetPlayers = function (players) {
+  _.each(players, function (player) {
+      player.shouldComeBack = true
+  })
+}
+
 var youDied = function (state, player) {
     player.deadTime = 0
     player.dead = true
@@ -50,8 +56,13 @@ var youDied = function (state, player) {
     var livingPlayers = _.select(state.players, function (thePlayer) {
       return !thePlayer.dead
     })
-    if (livingPlayers.length == 1) {
+  
+    var playersLeft = livingPlayers.length
+    if (playersLeft == 1) {
       youWin(state, livingPlayers[0])
+      resetPlayers(state.players)
+    } else if (playersLeft == 0) {
+      resetPlayers(state.players)
     }
 }
 
@@ -285,7 +296,8 @@ bman.onTime = function (state, timeEvent) {
       }
 
 
-      if (player.dead) {
+      if (player.dead /*&& player.shouldComeBack*/) {
+        player.shouldComeBack = false
         player.deadTime += elapsed
         if (player.deadTime >= 3000) {
           player.dead = false
@@ -338,7 +350,7 @@ bman.onTime = function (state, timeEvent) {
     }
   })
 
-  //console.log(_.keys(state.bombs).length)
+  console.log(_.keys(state.players).length)
 
   //console.log(Date.now() - s)
 } 
