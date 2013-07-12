@@ -32,6 +32,29 @@ var moveGoing = function (elapsed, dx, goingX, x, rate) {
   return newX
 }
 
+var youWin = function (state, winningPlayer) {
+  winningPlayer.winTime = 0
+  winningPlayer.img = winningPlayer.baseImage + "w"
+  state.hasChanges = true
+  state.changesInWhereThingsAre[winningPlayer.id] = generateChange(winningPlayer)
+}
+
+var youDied = function (state, player) {
+    player.deadTime = 0
+    player.dead = true
+    player.img = player.baseImage + "l"
+    state.hasChanges = true
+    state.changesInWhereThingsAre[player.id] = generateChange(player)
+    // todo: maybe have a "live" hash for players still in the game
+
+    var livingPlayers = _.select(state.players, function (thePlayer) {
+      return !thePlayer.dead
+    })
+    if (livingPlayers.length == 1) {
+      youWin(state, livingPlayers[0])
+    }
+}
+
 var addFlame = function(state, bomb, x, y, w, h, img) {
     var flames = state.flames
     var bombs = state.bombs
@@ -54,25 +77,7 @@ var addFlame = function(state, bomb, x, y, w, h, img) {
         if (flamePosKey in state.playersPos) {
           _.each(state.playersPos[flamePosKey], function (player){
             // was here
-            if (flamesPlayer != player && !player.dead) {
-              flamesPlayer.points += 1
-              if (flamesPlayer.points == 1) {
-                console.log(flamesPlayer.id + " wins")
-                flamesPlayer.won = true
-                _.each(state.players, function (player) {
-                  player.points = 0  
-                })
-                flamesPlayer.winTime = 0
-                flamesPlayer.img = flamesPlayer.baseImage + "w"
-                state.hasChanges = true
-                state.changesInWhereThingsAre[flamesPlayer.id] = generateChange(flamesPlayer)
-              }
-            }
-            player.deadTime = 0
-            player.dead = true
-            player.img = player.baseImage + "l"
-            state.hasChanges = true
-            state.changesInWhereThingsAre[player.id] = generateChange(player)
+            youDied(state, player)
            // player.bombs = -1
           })
         }
@@ -281,13 +286,13 @@ bman.onTime = function (state, timeEvent) {
 
 
       if (player.dead) {
-        //player.deadTime += elapsed
-        //if (player.deadTime >= 3000) {
-        //  player.dead = false
-        //  player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
-        //  state.hasChanges = true
-        //  state.changesInWhereThingsAre[playerId] = generateChange(player)
-        //}
+        player.deadTime += elapsed
+        if (player.deadTime >= 3000) {
+          player.dead = false
+          player.img = player.baseImage + player.direction + Math.floor(player.animationFrame) //todo: this line is duplicated somewhere else
+          state.hasChanges = true
+          state.changesInWhereThingsAre[playerId] = generateChange(player)
+        }
       }
 
       if (player.won) {
@@ -521,7 +526,7 @@ bman.aDown = function (state, id) {
         fuse: 3000,
         color: "444",
         player: player,
-        length: 15,
+        length: 2,
         animTime: state.time
       }
 
