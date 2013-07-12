@@ -13,11 +13,20 @@ var movedValue = function (elapsed, dx, x, rate) {
   return (rate * elapsed * dx) + x
 }
 
-var maxed = function (w, x) {
+var maxed = function (player, w, x) {
 
   var maxX = viewWidth - w
   var minX = 0 - w
-  return x < minX ? minX : x > maxX ? maxX : x
+  if (x < minX) {
+    resetTouchStart(player)
+    return minX
+  } else if (x > maxX) {
+    resetTouchStart(player)
+    return maxX
+  } else {
+    return x
+  }
+  //return x < minX ? minX : x > maxX ? maxX : x
 }
 
 
@@ -180,8 +189,8 @@ bman.onTime = function (state, timeEvent) {
         var oldY = player.y
         var oldGridX = player.gridX
         var oldGridY = player.gridY
-        player.x = maxed(player.originX, movedValue(elapsed, player.dx, player.x, player.moveRate))
-        player.y = maxed(player.originY, movedValue(elapsed, player.dy, player.y, player.moveRate))
+        player.x = maxed(player, player.originX, movedValue(elapsed, player.dx, player.x, player.moveRate))
+        player.y = maxed(player, player.originY, movedValue(elapsed, player.dy, player.y, player.moveRate))
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
         //setplayersPos(state, player, player.gridX, player.gridY)
@@ -234,7 +243,9 @@ bman.onTime = function (state, timeEvent) {
 
         // todo: don't auto set player.x player.gridx player.y player.gridy.
         // set new variables like newX newY etc. Watch out for your newY down below
+        var hitWall = false;
         var resetPlayer = function (player, x, y, gridX, gridY) {
+          hitWall = true;
           player.x = x
           player.y = y
           player.gridX = gridX
@@ -291,6 +302,9 @@ bman.onTime = function (state, timeEvent) {
               }
             }
           }
+        }
+        if (hitWall) {
+          resetTouchStart(player)
         }
 
       }
@@ -402,6 +416,14 @@ bman.playerGoto = function (state, id, point) {
   }
 } 
 
+var resetTouchStart = function (player) {
+    player.touchStartX = player.lastMovedX
+    player.touchStartY = player.lastMovedY
+    player.playerStartX = player.x
+    player.playerStartY = player.y
+
+}
+
 var touchPadWay = function () {
   bman.onTouchStart = function (state, id, points) {
     var player = state.players[id]
@@ -491,8 +513,8 @@ bman.moveDiff = function (state, id, point) {
         var x = point[0]
         var y = point[1]
         var player = state.players[id]
-        player.x = maxed(player.w, player.x + x)
-        player.y = maxed(player.h, player.y + y)
+        player.x = maxed(player, player.w, player.x + x)
+        player.y = maxed(player, player.h, player.y + y)
         player.gridX = getGridValue(player.x, player.w, player.originX, gridUnitWidth)
         player.gridY = getGridValue(player.y, player.h, player.originY, gridUnitHeight)
 
@@ -535,7 +557,7 @@ bman.aDown = function (state, id) {
         img: "bomb",
         animIndex: 0,
         start: state.time,
-        fuse: 3000,
+        fuse: 30000,
         color: "444",
         player: player,
         length: 2,
