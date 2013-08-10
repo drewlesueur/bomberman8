@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta name = "viewport" content = "initial-scale = 1.0, maximum-scale=1, minimum-scale=1">
+<title>@minibman</title>
 <style>
   * {
     padding: 0;
@@ -72,9 +73,6 @@ spriteSheet.onload = function () {
 }
 
 
-var bomb = new Image()
-//bomb.src = "Banana.png"
-bomb.src = "Bomb.png"
 setTimeout(function () {
   //scrollTo(0, 0)
 }, 200)
@@ -92,22 +90,7 @@ canvasEl.style.height = viewHeight / devicePixelRatio + "px"
 var c = canvasEl.getContext("2d")
 //c.scale(2,2)
 
-var bomberSprites = new Image();
-bomberSprites.src = "Bomberman-SBM4.gif"
 var imgs = {
-  //"b": { img: bomb, x: 0, y: 0, w: 512, h: 512},
-  "b": { img: bomb, x: 0, y: 0, w: 256, h: 256},
-  "p": {img: bomberSprites, x: 11, y: 277, w: 16, h: 24},
-  "p2": {img: bomberSprites, x: 11, y: 302, w: 16, h: 24},
-  "p3": {img: bomberSprites, x: 11, y: 328, w: 16, h: 24},
-  "p4": {img: bomberSprites, x: 76, y: 328, w: 16, h: 24},
-  "p5": {img: bomberSprites, x: 43, y: 328, w: 16, h: 24},
-  "p6": {img: bomberSprites, x: 111, y: 328, w: 16, h: 24},
-  "p7": {img: bomberSprites, x: 144, y: 328, w: 16, h: 24},
-  "p8": {img: bomberSprites, x: 178, y: 328, w: 16, h: 24},
-  "f": {type: "color", color: "f00"},
-  //"d": {type: "color", color: "777"}
-  "d": {img: bomberSprites, x: 191, y: 174, w: 218 - 191, h: 202 - 174},
 }
 
 

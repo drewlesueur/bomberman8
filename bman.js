@@ -617,6 +617,7 @@ bman.onConnect = function (state, id) {
     img: baseImage + direction + 0,
     originalImg: img,
    // moveRate: 1/7,
+    //moveRate: 1/2,
     moveRate: 2,
     dx: 0,
     dy: 0,
